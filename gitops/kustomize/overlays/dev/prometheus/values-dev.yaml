@@ -1,0 +1,12 @@
+# Dev environment overrides for Prometheus
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      retention: 7d  # Shorter retention for dev
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 20Gi  # Smaller storage for dev
+

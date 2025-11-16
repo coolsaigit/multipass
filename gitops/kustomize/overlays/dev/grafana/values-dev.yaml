@@ -1,0 +1,6 @@
+# Dev environment overrides for Grafana
+grafana:
+  adminPassword: dev-admin  # Change in production!
+  persistence:
+    size: 5Gi  # Smaller storage for dev
+

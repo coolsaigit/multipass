@@ -1,0 +1,8 @@
+# Dev environment overrides for Istio
+istio-ingressgateway:
+  service:
+    type: LoadBalancer
+    annotations:
+      # Add cloud-specific annotations if needed
+      # service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+

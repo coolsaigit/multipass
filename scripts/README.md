@@ -35,7 +35,7 @@ Zero-touch deployment script that automates the entire GitOps setup.
 
 ### What it does
 
-1. **Checks prerequisites**: Verifies kubectl and helm are installed
+1. **Checks prerequisites**: Verifies kubectl is installed, auto-installs Helm if missing (macOS/Linux)
 2. **Adds ArgoCD Helm repo**: Adds the official ArgoCD Helm repository
 3. **Installs ArgoCD**: Installs ArgoCD using Helm
 4. **Waits for readiness**: Ensures ArgoCD is fully operational
@@ -47,8 +47,10 @@ Zero-touch deployment script that automates the entire GitOps setup.
 ### Requirements
 
 - `kubectl` configured to access your cluster
-- `helm` v3.x installed
+- `helm` v3.x (will be auto-installed if missing on macOS/Linux)
 - Cluster with sufficient resources
+- macOS: Homebrew (for auto-install)
+- Linux: curl and sudo access (for auto-install)
 
 ### Output
 

@@ -1,0 +1,5 @@
+# Dev environment overrides for Kiali
+kiali-server:
+  auth:
+    strategy: anonymous  # Use proper auth in staging/prod
+

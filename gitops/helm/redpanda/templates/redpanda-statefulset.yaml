@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: redpanda
   namespace: {{ .Values.namespace }}
@@ -8,6 +8,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
+  serviceName: redpanda
   replicas: {{ .Values.redpanda.replicas }}
   selector:
     matchLabels:
@@ -29,17 +30,17 @@ spec:
         - --kafka-addr
         - internal://0.0.0.0:9092,external://0.0.0.0:19092
         - --advertise-kafka-addr
-        - internal://redpanda:9092,external://localhost:19092
+        - internal://redpanda-$(POD_NAME).redpanda:9092,external://redpanda-$(POD_NAME).redpanda:19092
         - --pandaproxy-addr
         - internal://0.0.0.0:8082,external://0.0.0.0:18082
         - --advertise-pandaproxy-addr
-        - internal://redpanda:8082,external://localhost:18082
+        - internal://redpanda-$(POD_NAME).redpanda:8082,external://redpanda-$(POD_NAME).redpanda:18082
         - --schema-registry-addr
         - internal://0.0.0.0:8081,external://0.0.0.0:18081
         - --rpc-addr
         - 0.0.0.0:33145
         - --advertise-rpc-addr
-        - redpanda:33145
+        - redpanda-$(POD_NAME).redpanda:33145
         - --smp
         - "1"
         - --memory
@@ -47,6 +48,11 @@ spec:
         - --mode
         - dev-container
         - --default-log-level=info
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         ports:
         - containerPort: 9092
           name: kafka-int
@@ -71,10 +77,18 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.redpanda.resources | nindent 10 }}
-      volumes:
-      {{- if .Values.redpanda.persistence.enabled }}
-      - name: data
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-redpanda-data
+  {{- if .Values.redpanda.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+        - {{ .Values.redpanda.persistence.accessMode }}
+      {{- if .Values.redpanda.persistence.storageClass }}
+      storageClassName: {{ .Values.redpanda.persistence.storageClass }}
       {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.redpanda.persistence.size }}
+  {{- end }}
 
