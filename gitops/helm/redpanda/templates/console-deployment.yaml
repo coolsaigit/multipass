@@ -24,11 +24,11 @@ spec:
         imagePullPolicy: {{ .Values.console.image.pullPolicy }}
         env:
         - name: KAFKA_BROKERS
-          value: "redpanda:9092"
+          value: "redpanda.{{ .Values.namespace }}.svc.cluster.local:9092"
         - name: KAFKA_SCHEMAREGISTRY_ENABLED
           value: "true"
         - name: KAFKA_SCHEMAREGISTRY_URLS
-          value: "http://redpanda:8081"
+          value: "http://redpanda.{{ .Values.namespace }}.svc.cluster.local:8081"
         - name: KAFKA_PRODUCER_ENABLED
           value: "true"
         - name: KAFKA_CONSUMER_ENABLED

@@ -30,17 +30,17 @@ spec:
         - --kafka-addr
         - internal://0.0.0.0:9092,external://0.0.0.0:19092
         - --advertise-kafka-addr
-        - internal://redpanda-$(POD_NAME).redpanda:9092,external://redpanda-$(POD_NAME).redpanda:19092
+        - internal://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:9092,external://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:19092
         - --pandaproxy-addr
         - internal://0.0.0.0:8082,external://0.0.0.0:18082
         - --advertise-pandaproxy-addr
-        - internal://redpanda-$(POD_NAME).redpanda:8082,external://redpanda-$(POD_NAME).redpanda:18082
+        - internal://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:8082,external://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:18082
         - --schema-registry-addr
         - internal://0.0.0.0:8081,external://0.0.0.0:18081
         - --rpc-addr
         - 0.0.0.0:33145
         - --advertise-rpc-addr
-        - redpanda-$(POD_NAME).redpanda:33145
+        - redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:33145
         - --smp
         - "1"
         - --memory
