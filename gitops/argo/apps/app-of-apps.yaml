@@ -10,7 +10,7 @@ metadata:
 spec:
   project: multipass
   source:
-    repoURL: https://github.com/your-org/multipass-gitops.git
+    repoURL: https://github.com/coolsaigit/multipass.git
     targetRevision: main
     path: gitops/argo/apps
   destination:

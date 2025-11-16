@@ -100,7 +100,7 @@ fi
 # Step 6: Configure Git repository (if needed)
 echo -e "${YELLOW}Step 6: Configuring Git repository...${NC}"
 echo -e "${YELLOW}Note: Update repoURL in Application manifests if needed${NC}"
-echo -e "${YELLOW}Current repoURL placeholder: https://github.com/your-org/multipass-gitops.git${NC}\n"
+echo -e "${YELLOW}Current repoURL placeholder: https://github.com/coolsaigit/multipass.git${NC}\n"
 
 # Step 7: Create bootstrap Application
 echo -e "${YELLOW}Step 7: Creating bootstrap Application...${NC}"

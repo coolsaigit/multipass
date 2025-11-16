@@ -16,7 +16,7 @@ echo -e "${BLUE}=== Migrate to GitOps ===${NC}\n"
 echo -e "${YELLOW}Step 1: Checking Git repository configuration...${NC}"
 REPO_URL=$(grep -h "repoURL:" "${REPO_ROOT}"/gitops/argo/apps/*.yaml | head -1 | awk '{print $2}' | tr -d '"')
 
-if [[ "$REPO_URL" == *"your-org"* ]] || [[ "$REPO_URL" == *"placeholder"* ]]; then
+if [[ "$REPO_URL" == *"coolsaigit"* ]] || [[ "$REPO_URL" == *"placeholder"* ]]; then
     echo -e "${RED}⚠️  WARNING: Repository URL is still a placeholder!${NC}"
     echo -e "${YELLOW}Current repoURL: $REPO_URL${NC}"
     echo ""

@@ -33,11 +33,11 @@ This script will:
 
 ```bash
 # Find all files that need updating
-grep -r "your-org/multipass-gitops" gitops/argo/apps/
+grep -r "coolsaigit/multipass" gitops/argo/apps/
 
 # Replace with your actual repository URL
-# Example: https://github.com/yourusername/multipass-gitops.git
-find gitops/argo/apps -name "*.yaml" -exec sed -i '' 's|https://github.com/your-org/multipass-gitops.git|YOUR_ACTUAL_REPO_URL|g' {} \;
+# Example: https://github.com/yourusername/multipass.git
+find gitops/argo/apps -name "*.yaml" -exec sed -i '' 's|https://github.com/coolsaigit/multipass.git|YOUR_ACTUAL_REPO_URL|g' {} \;
 ```
 
 Files to update:

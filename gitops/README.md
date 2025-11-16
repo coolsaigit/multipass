@@ -126,7 +126,7 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 
 Update the `repoURL` in all ArgoCD Application manifests:
 - `gitops/argo/apps/*.yaml`
-- Replace `https://github.com/your-org/multipass-gitops.git` with your actual repository URL
+- Replace `https://github.com/coolsaigit/multipass.git` with your actual repository URL
 
 #### 3. Create ArgoCD Project
 
