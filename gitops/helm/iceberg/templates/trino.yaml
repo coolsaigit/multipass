@@ -8,14 +8,14 @@ data:
   node.properties: |
     node.environment=production
     node.data-dir=/tmp/trino-data
-         config.properties: |
-           coordinator=true
-           node-scheduler.include-coordinator=false
-           http-server.http.port=8080
-           http-server.process-forwarded=true
-           discovery.uri=http://trino.{{ .Values.namespace }}.svc.cluster.local:8080
-           query.max-memory={{ .Values.trino.config.queryMaxMemory }}
-           query.max-memory-per-node={{ .Values.trino.config.queryMaxMemoryPerNode }}
+  config.properties: |
+    coordinator=true
+    node-scheduler.include-coordinator=false
+    http-server.http.port=8080
+    http-server.process-forwarded=true
+    discovery.uri=http://trino.{{ .Values.namespace }}.svc.cluster.local:8080
+    query.max-memory={{ .Values.trino.config.queryMaxMemory }}
+    query.max-memory-per-node={{ .Values.trino.config.queryMaxMemoryPerNode }}
   jvm.config: |
     -server
     -Xmx{{ .Values.trino.config.jvmHeapSize }}
