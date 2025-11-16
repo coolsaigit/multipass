@@ -1,0 +1,99 @@
+{{- if .Values.trino.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trino-config
+  namespace: {{ .Values.namespace }}
+data:
+  node.properties: |
+    node.environment=production
+    node.data-dir=/tmp/trino-data
+  config.properties: |
+    coordinator=true
+    node-scheduler.include-coordinator=true
+    http-server.http.port=8080
+    discovery.uri=http://localhost:8080
+    query.max-memory={{ .Values.trino.config.queryMaxMemory }}
+    query.max-memory-per-node={{ .Values.trino.config.queryMaxMemoryPerNode }}
+  jvm.config: |
+    -server
+    -Xmx{{ .Values.trino.config.jvmHeapSize }}
+    -XX:+UseG1GC
+    -XX:G1HeapRegionSize=32M
+    -XX:+UseGCOverheadLimit
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:+ExitOnOutOfMemoryError
+  log.properties: |
+    io.trino=INFO
+  iceberg.properties: |
+    connector.name=iceberg
+    iceberg.catalog.type=rest
+    iceberg.rest-catalog.uri=http://rest-catalog.{{ .Values.namespace }}:8181
+    iceberg.warehouse={{ .Values.restCatalog.env.warehouse }}
+    iceberg.s3.endpoint={{ .Values.restCatalog.env.s3Endpoint }}
+    iceberg.s3.path-style-access={{ .Values.restCatalog.env.s3PathStyleAccess }}
+    iceberg.s3.aws-access-key={{ .Values.restCatalog.env.s3AccessKey }}
+    iceberg.s3.aws-secret-key={{ .Values.restCatalog.env.s3SecretKey }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  replicas: {{ .Values.trino.replicas }}
+  selector:
+    matchLabels:
+      app: trino
+  template:
+    metadata:
+      labels:
+        app: trino
+    spec:
+      containers:
+      - name: trino
+        image: "{{ .Values.trino.image.repository }}:{{ .Values.trino.image.tag }}"
+        imagePullPolicy: {{ .Values.trino.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /etc/trino
+        - name: catalog
+          mountPath: /etc/trino/catalog
+        resources:
+          {{- toYaml .Values.trino.resources | nindent 10 }}
+      volumes:
+      - name: config
+        configMap:
+          name: trino-config
+      - name: catalog
+        configMap:
+          name: trino-config
+          items:
+          - key: iceberg.properties
+            path: iceberg.properties
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: trino
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: trino
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  selector:
+    app: trino
+{{- end }}
+

@@ -1,0 +1,31 @@
+namespace: flink
+
+image:
+  repository: flink
+  tag: latest
+  pullPolicy: IfNotPresent
+
+jobmanager:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+taskmanager:
+  replicas: 1
+  taskSlots: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+parallelism:
+  default: 2
+

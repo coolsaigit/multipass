@@ -1,0 +1,10 @@
+apiVersion: v2
+name: argocd
+description: ArgoCD GitOps continuous delivery tool
+type: application
+version: 0.1.0
+appVersion: "latest"
+# Note: This chart references the official ArgoCD Helm chart
+# Installation is handled by bootstrap.sh which uses: helm install argocd argo/argo-cd
+# This chart is kept for reference and potential future use
+

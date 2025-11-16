@@ -1,0 +1,23 @@
+# ArgoCD Installation via Helm
+# This is an optional bootstrap file. You can install ArgoCD using:
+# 
+# Option 1: Using Helm directly
+# helm repo add argo https://argoproj.github.io/argo-helm
+# helm install argocd argo/argo-cd --namespace argocd --create-namespace
+#
+# Option 2: Using kubectl (for quick testing)
+# kubectl create namespace argocd
+# kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+#
+# Option 3: Using this file (if you want to version control the installation)
+# kubectl apply -f gitops/argo/bootstrap/argocd-install.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+---
+# Note: This is a placeholder. For production, use the official ArgoCD installation manifests
+# or install via Helm with proper configuration
+# See: https://argo-cd.readthedocs.io/en/stable/operator-manual/installation/
+

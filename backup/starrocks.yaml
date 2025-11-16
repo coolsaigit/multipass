@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starrocks
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: starrocks-fe-data
+  namespace: starrocks
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: starrocks-be-data
+  namespace: starrocks
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starrocks-fe
+  namespace: starrocks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: starrocks-fe
+  template:
+    metadata:
+      labels:
+        app: starrocks-fe
+    spec:
+      containers:
+      - name: starrocks-fe
+        image: starrocks/fe-ubuntu:latest
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          /opt/starrocks/fe/bin/start_fe.sh
+          tail -f /opt/starrocks/fe/log/fe.log
+        ports:
+        - containerPort: 8030
+          name: http
+        - containerPort: 9020
+          name: rpc
+        - containerPort: 9030
+          name: query
+        env:
+        - name: FE_SERVERS
+          value: "starrocks-fe:9010"
+        - name: PRIORITY_NETWORKS
+          value: "10.0.0.0/8"
+        volumeMounts:
+        - name: data
+          mountPath: /opt/starrocks/fe/meta
+        - name: log
+          mountPath: /opt/starrocks/fe/log
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: starrocks-fe-data
+      - name: log
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starrocks-fe
+  namespace: starrocks
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8030
+    targetPort: 8030
+    name: http
+  - port: 9020
+    targetPort: 9020
+    name: rpc
+  - port: 9030
+    targetPort: 9030
+    name: query
+  selector:
+    app: starrocks-fe
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starrocks-be
+  namespace: starrocks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: starrocks-be
+  template:
+    metadata:
+      labels:
+        app: starrocks-be
+    spec:
+      containers:
+      - name: starrocks-be
+        image: starrocks/be-ubuntu:latest
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          /opt/starrocks/be/bin/start_be.sh
+          tail -f /opt/starrocks/be/log/be.INFO
+        ports:
+        - containerPort: 9060
+          name: be
+        - containerPort: 8040
+          name: webserver
+        - containerPort: 8060
+          name: heartbeat
+        env:
+        - name: FE_SERVICE
+          value: "starrocks-fe:9020"
+        volumeMounts:
+        - name: data
+          mountPath: /opt/starrocks/be/storage
+        - name: log
+          mountPath: /opt/starrocks/be/log
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: starrocks-be-data
+      - name: log
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starrocks-be
+  namespace: starrocks
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9060
+    targetPort: 9060
+    name: be
+  - port: 8040
+    targetPort: 8040
+    name: webserver
+  - port: 8060
+    targetPort: 8060
+    name: heartbeat
+  selector:
+    app: starrocks-be
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: iceberg
+description: Apache Iceberg data lake with REST catalog and Trino
+type: application
+version: 0.1.0
+appVersion: "latest"
+

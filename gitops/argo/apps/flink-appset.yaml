@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: flink
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: dev
+            namespace: flink
+            valuesFile: gitops/kustomize/overlays/dev/flink/values-dev.yaml
+            prune: true
+          - environment: staging
+            namespace: flink
+            valuesFile: gitops/kustomize/overlays/staging/flink/values-staging.yaml
+            prune: true
+          - environment: prod
+            namespace: flink
+            valuesFile: gitops/kustomize/overlays/prod/flink/values-prod.yaml
+            prune: false
+  template:
+    metadata:
+      name: flink-{{environment}}
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: multipass
+      source:
+        repoURL: https://github.com/your-org/multipass-gitops.git
+        targetRevision: main
+        path: gitops/helm/flink
+        helm:
+          valueFiles:
+            - values.yaml
+            - "{{valuesFile}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: {{prune}}
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+

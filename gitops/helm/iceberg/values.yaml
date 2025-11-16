@@ -1,0 +1,42 @@
+namespace: iceberg
+
+restCatalog:
+  enabled: true
+  image:
+    repository: tabulario/iceberg-rest
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  env:
+    warehouse: "s3://iceberg-warehouse/"
+    s3Endpoint: "http://minio.minio:9000"
+    s3AccessKey: "minioadmin"
+    s3SecretKey: "minioadmin"
+    s3PathStyleAccess: "true"
+
+trino:
+  enabled: true
+  image:
+    repository: trinodb/trino
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+  config:
+    queryMaxMemory: "2GB"
+    queryMaxMemoryPerNode: "1GB"
+    jvmHeapSize: "1G"
+

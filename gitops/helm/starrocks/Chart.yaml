@@ -1,0 +1,7 @@
+apiVersion: v2
+name: starrocks
+description: StarRocks OLAP database
+type: application
+version: 0.1.0
+appVersion: "latest"
+

@@ -1,0 +1,27 @@
+# Staging environment overrides for StarRocks Helm chart
+namespace: starrocks
+
+frontend:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  persistence:
+    size: 10Gi
+
+backend:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  persistence:
+    size: 20Gi
+

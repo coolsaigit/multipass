@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: multipass
+  namespace: argocd
+spec:
+  description: Multipass data platform project
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  roles:
+    - name: admin
+      policies:
+        - p, proj:multipass:admin, applications, *, multipass/*, allow
+        - p, proj:multipass:admin, repositories, *, *, allow
+      groups:
+        - multipass:admins
+    - name: developer
+      policies:
+        - p, proj:multipass:developer, applications, get, multipass/*, allow
+        - p, proj:multipass:developer, applications, sync, multipass/*, allow
+      groups:
+        - multipass:developers
+

@@ -1,0 +1,27 @@
+# Staging environment overrides for Flink Helm chart
+namespace: flink
+
+jobmanager:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+
+taskmanager:
+  replicas: 2
+  taskSlots: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+
+parallelism:
+  default: 4
+

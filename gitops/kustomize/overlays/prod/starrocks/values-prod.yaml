@@ -1,0 +1,27 @@
+# Production environment overrides for StarRocks Helm chart
+namespace: starrocks
+
+frontend:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+  persistence:
+    size: 50Gi
+
+backend:
+  replicas: 3
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 4Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+  persistence:
+    size: 100Gi
+

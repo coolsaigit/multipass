@@ -1,0 +1,99 @@
+{{- if .Values.frontend.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: starrocks-fe-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.frontend.persistence.accessMode }}
+  {{- if .Values.frontend.persistence.storageClass }}
+  storageClassName: {{ .Values.frontend.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.frontend.persistence.size }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starrocks-fe
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: starrocks-fe
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: starrocks-fe
+  template:
+    metadata:
+      labels:
+        app: starrocks-fe
+    spec:
+      containers:
+      - name: starrocks-fe
+        image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+        imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          /opt/starrocks/fe/bin/start_fe.sh
+          tail -f /opt/starrocks/fe/log/fe.log
+        ports:
+        - containerPort: 8030
+          name: http
+        - containerPort: 9020
+          name: rpc
+        - containerPort: 9030
+          name: query
+        env:
+        - name: FE_SERVERS
+          value: "starrocks-fe:9010"
+        - name: PRIORITY_NETWORKS
+          value: "10.0.0.0/8"
+        volumeMounts:
+        {{- if .Values.frontend.persistence.enabled }}
+        - name: data
+          mountPath: /opt/starrocks/fe/meta
+        {{- end }}
+        - name: log
+          mountPath: /opt/starrocks/fe/log
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
+      volumes:
+      {{- if .Values.frontend.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: starrocks-fe-data
+      {{- end }}
+      - name: log
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starrocks-fe
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: starrocks-fe
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8030
+    targetPort: 8030
+    name: http
+  - port: 9020
+    targetPort: 9020
+    name: rpc
+  - port: 9030
+    targetPort: 9030
+    name: query
+  selector:
+    app: starrocks-fe
+

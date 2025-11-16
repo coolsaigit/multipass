@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: starrocks
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: dev
+            namespace: starrocks
+            valuesFile: gitops/kustomize/overlays/dev/starrocks/values-dev.yaml
+            prune: true
+          - environment: staging
+            namespace: starrocks
+            valuesFile: gitops/kustomize/overlays/staging/starrocks/values-staging.yaml
+            prune: true
+          - environment: prod
+            namespace: starrocks
+            valuesFile: gitops/kustomize/overlays/prod/starrocks/values-prod.yaml
+            prune: false
+  template:
+    metadata:
+      name: starrocks-{{environment}}
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: multipass
+      source:
+        repoURL: https://github.com/your-org/multipass-gitops.git
+        targetRevision: main
+        path: gitops/helm/starrocks
+        helm:
+          valueFiles:
+            - values.yaml
+            - "{{valuesFile}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: {{prune}}
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+

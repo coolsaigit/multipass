@@ -1,0 +1,97 @@
+{{- if .Values.backend.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: starrocks-be-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.backend.persistence.accessMode }}
+  {{- if .Values.backend.persistence.storageClass }}
+  storageClassName: {{ .Values.backend.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backend.persistence.size }}
+---
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: starrocks-be
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: starrocks-be
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: starrocks-be
+  template:
+    metadata:
+      labels:
+        app: starrocks-be
+    spec:
+      containers:
+      - name: starrocks-be
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          /opt/starrocks/be/bin/start_be.sh
+          tail -f /opt/starrocks/be/log/be.INFO
+        ports:
+        - containerPort: 9060
+          name: be
+        - containerPort: 8040
+          name: webserver
+        - containerPort: 8060
+          name: heartbeat
+        env:
+        - name: FE_SERVICE
+          value: "starrocks-fe:9020"
+        volumeMounts:
+        {{- if .Values.backend.persistence.enabled }}
+        - name: data
+          mountPath: /opt/starrocks/be/storage
+        {{- end }}
+        - name: log
+          mountPath: /opt/starrocks/be/log
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+      volumes:
+      {{- if .Values.backend.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: starrocks-be-data
+      {{- end }}
+      - name: log
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: starrocks-be
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: starrocks-be
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9060
+    targetPort: 9060
+    name: be
+  - port: 8040
+    targetPort: 8040
+    name: webserver
+  - port: 8060
+    targetPort: 8060
+    name: heartbeat
+  selector:
+    app: starrocks-be
+

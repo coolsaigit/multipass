@@ -1,0 +1,19 @@
+# Helm
+*.tgz
+charts/*.tgz
+
+# Kustomize
+*.yaml.bak
+*.yaml.orig
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+

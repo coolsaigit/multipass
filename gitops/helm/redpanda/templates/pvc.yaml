@@ -1,0 +1,17 @@
+{{- if .Values.redpanda.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redpanda-data
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - {{ .Values.redpanda.persistence.accessMode }}
+  {{- if .Values.redpanda.persistence.storageClass }}
+  storageClassName: {{ .Values.redpanda.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.redpanda.persistence.size }}
+{{- end }}
+

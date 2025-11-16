@@ -1,0 +1,16 @@
+# Staging environment overrides for MinIO Helm chart
+namespace: minio
+
+replicas: 1
+
+persistence:
+  size: 20Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
+
