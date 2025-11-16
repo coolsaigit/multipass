@@ -237,6 +237,17 @@ This script will:
    ```
 
 2. **Access via Port-Forward** (if LoadBalancer not available):
+   
+   **Recommended: Use unified access script** (handles all services via single port-forward):
+   ```bash
+   ./scripts/access-all-services.sh
+   ```
+   This script:
+   - Starts a single port-forward to Istio Gateway (port 8080)
+   - Provides access to ALL services via hostname routing
+   - Avoids port conflicts (ArgoCD and Redpanda both use 8080 internally, but accessed via Gateway)
+   
+   **Manual port-forward:**
    ```bash
    kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
    ```
@@ -244,6 +255,8 @@ This script will:
    ```bash
    curl -H "Host: argocd.local" http://localhost:8080
    ```
+   
+   **Important**: Always use Istio Gateway for access. Do NOT port-forward directly to individual services (ArgoCD or Redpanda Console) as they both use port 8080 internally and would conflict.
 
 3. **Update /etc/hosts** (for local access):
    ```bash
