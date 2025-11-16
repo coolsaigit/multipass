@@ -9,7 +9,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-NAMESPACES=("minio" "redpanda" "flink" "starrocks" "iceberg")
+NAMESPACES=("minio" "redpanda" "flink" "starrocks" "iceberg" "monitoring" "istio-system")
 ARGOCD_NAMESPACE="argocd"
 PRESERVE_DATA=false
 
@@ -81,8 +81,20 @@ for ns in "${NAMESPACES[@]}"; do
     if kubectl get namespace "$ns" &>/dev/null; then
         echo -e "${YELLOW}Cleaning up namespace: $ns${NC}"
         
-        # Delete all resources in namespace
-        kubectl delete all --all -n "$ns" --ignore-not-found=true
+        # Delete StatefulSets first (they manage PVCs and need special handling)
+        echo -e "  Deleting StatefulSets in $ns..."
+        kubectl delete statefulset --all -n "$ns" --ignore-not-found=true --cascade=orphan
+        
+        # Delete Deployments and other workloads
+        echo -e "  Deleting Deployments and workloads in $ns..."
+        kubectl delete deployment,daemonset,replicaset --all -n "$ns" --ignore-not-found=true
+        
+        # Delete Services
+        echo -e "  Deleting Services in $ns..."
+        kubectl delete svc --all -n "$ns" --ignore-not-found=true
+        
+        # Delete Pods (in case any are orphaned)
+        kubectl delete pods --all -n "$ns" --ignore-not-found=true --grace-period=0 --force 2>/dev/null || true
         
         # Handle PVCs based on preserve-data flag
         if [ "$PRESERVE_DATA" = false ]; then
@@ -92,12 +104,21 @@ for ns in "${NAMESPACES[@]}"; do
             echo -e "  Preserving PVCs in $ns..."
         fi
         
-        # Delete ConfigMaps and Secrets
-        kubectl delete configmap,secret --all -n "$ns" --ignore-not-found=true
+        # Delete ConfigMaps, Secrets, and other resources
+        echo -e "  Deleting ConfigMaps, Secrets, and other resources in $ns..."
+        kubectl delete configmap,secret,ingress,networkpolicy --all -n "$ns" --ignore-not-found=true
         
-        # Finally delete the namespace
-        echo -e "  Deleting namespace: $ns..."
-        kubectl delete namespace "$ns" --ignore-not-found=true
+        # Delete Istio resources if in istio-system namespace
+        if [ "$ns" = "istio-system" ]; then
+            echo -e "  Deleting Istio resources in $ns..."
+            kubectl delete gateway,virtualservice,destinationrule,serviceentry --all -n "$ns" --ignore-not-found=true || true
+        fi
+        
+        # Finally delete the namespace (skip for istio-system and argocd - handled separately)
+        if [ "$ns" != "istio-system" ] && [ "$ns" != "$ARGOCD_NAMESPACE" ]; then
+            echo -e "  Deleting namespace: $ns..."
+            kubectl delete namespace "$ns" --ignore-not-found=true
+        fi
         
         echo -e "${GREEN}✓ Cleaned up $ns${NC}\n"
     else
@@ -105,8 +126,32 @@ for ns in "${NAMESPACES[@]}"; do
     fi
 done
 
-# Step 3: Clean up ArgoCD (optional)
-echo -e "${BLUE}Step 3: Checking ArgoCD...${NC}\n"
+# Step 3: Clean up Istio (optional)
+echo -e "${BLUE}Step 3: Checking Istio...${NC}\n"
+if kubectl get namespace "istio-system" &>/dev/null; then
+    echo -e "${YELLOW}Istio namespace found.${NC}"
+    read -p "Do you want to remove Istio? (yes/no): " -r
+    echo ""
+    
+    if [[ $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
+        echo -e "${YELLOW}Removing Istio...${NC}"
+        
+        # Delete Istio resources
+        kubectl delete gateway,virtualservice,destinationrule,serviceentry --all -n "istio-system" --ignore-not-found=true || true
+        kubectl delete all --all -n "istio-system" --ignore-not-found=true
+        
+        # Delete namespace
+        kubectl delete namespace "istio-system" --ignore-not-found=true
+        echo -e "${GREEN}✓ Istio removed${NC}\n"
+    else
+        echo -e "${YELLOW}Keeping Istio.${NC}\n"
+    fi
+else
+    echo -e "${GREEN}✓ Istio not installed${NC}\n"
+fi
+
+# Step 4: Clean up ArgoCD (optional)
+echo -e "${BLUE}Step 4: Checking ArgoCD...${NC}\n"
 if kubectl get namespace "$ARGOCD_NAMESPACE" &>/dev/null; then
     echo -e "${YELLOW}ArgoCD namespace found.${NC}"
     read -p "Do you want to remove ArgoCD? (yes/no): " -r
@@ -114,6 +159,9 @@ if kubectl get namespace "$ARGOCD_NAMESPACE" &>/dev/null; then
     
     if [[ $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
         echo -e "${YELLOW}Removing ArgoCD...${NC}"
+        
+        # Delete ArgoCD Applications and ApplicationSets first
+        kubectl delete application,applicationset --all -n "$ARGOCD_NAMESPACE" --ignore-not-found=true || true
         
         # Check if installed via Helm
         if helm list -n "$ARGOCD_NAMESPACE" 2>/dev/null | grep -q "argocd"; then
@@ -131,8 +179,8 @@ else
     echo -e "${GREEN}✓ ArgoCD not installed${NC}\n"
 fi
 
-# Step 4: Clean up any Helm releases
-echo -e "${BLUE}Step 4: Checking for Helm releases...${NC}\n"
+# Step 5: Clean up any Helm releases
+echo -e "${BLUE}Step 5: Checking for Helm releases...${NC}\n"
 for ns in "${NAMESPACES[@]}"; do
     if helm list -n "$ns" 2>/dev/null | grep -v "^NAME"; then
         echo -e "${YELLOW}Found Helm releases in $ns:${NC}"
