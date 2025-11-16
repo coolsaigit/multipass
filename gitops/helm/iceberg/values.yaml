@@ -37,6 +37,6 @@ trino:
       memory: 2Gi
   config:
     queryMaxMemory: "2GB"
-    queryMaxMemoryPerNode: "1GB"
+    queryMaxMemoryPerNode: "700MB"
     jvmHeapSize: "1G"
 

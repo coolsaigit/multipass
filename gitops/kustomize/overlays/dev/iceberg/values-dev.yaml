@@ -20,3 +20,7 @@ trino:
     limits:
       cpu: 1000m
       memory: 1Gi
+  config:
+    queryMaxMemory: "1GB"
+    queryMaxMemoryPerNode: "500MB"
+    jvmHeapSize: "512M"
