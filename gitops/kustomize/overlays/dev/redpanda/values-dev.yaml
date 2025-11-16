@@ -1,4 +1,4 @@
-# Development environment overrides for Redpanda Helm chart
+# Development environment overrides for Redpanda Operator CRD
 namespace: dev
 
 # StatefulSet configuration for dev
@@ -23,7 +23,6 @@ storage:
 config:
   node:
     developer_mode: true
-    empty_seed_starts_cluster: false
 
 # Console configuration for dev
 console:
