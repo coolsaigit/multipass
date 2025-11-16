@@ -8,6 +8,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
+  clusterIP: None
   type: ClusterIP
   ports:
   - port: 9092
