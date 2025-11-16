@@ -36,7 +36,7 @@ spec:
         namespace: "{{namespace}}"
       syncPolicy:
         automated:
-          prune: {{prune}}
+          prune: true == "true"
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
