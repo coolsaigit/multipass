@@ -11,13 +11,13 @@ spec:
         elements:
           - environment: dev
             namespace: minio
-            valuesFile: gitops/kustomize/overlays/dev/minio/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/minio/values-dev.yaml
           - environment: staging
             namespace: minio
-            valuesFile: gitops/kustomize/overlays/staging/minio/values-staging.yaml
+            valuesFile: ../../kustomize/overlays/staging/minio/values-staging.yaml
           - environment: prod
             namespace: minio
-            valuesFile: gitops/kustomize/overlays/prod/minio/values-prod.yaml
+            valuesFile: ../../kustomize/overlays/prod/minio/values-prod.yaml
   template:
     metadata:
       name: minio-{{environment}}

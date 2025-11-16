@@ -11,13 +11,13 @@ spec:
         elements:
           - environment: dev
             namespace: starrocks
-            valuesFile: gitops/kustomize/overlays/dev/starrocks/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/starrocks/values-dev.yaml
           - environment: staging
             namespace: starrocks
-            valuesFile: gitops/kustomize/overlays/staging/starrocks/values-staging.yaml
+            valuesFile: ../../kustomize/overlays/staging/starrocks/values-staging.yaml
           - environment: prod
             namespace: starrocks
-            valuesFile: gitops/kustomize/overlays/prod/starrocks/values-prod.yaml
+            valuesFile: ../../kustomize/overlays/prod/starrocks/values-prod.yaml
   template:
     metadata:
       name: starrocks-{{environment}}

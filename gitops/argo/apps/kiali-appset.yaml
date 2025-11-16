@@ -11,7 +11,7 @@ spec:
         elements:
           - environment: dev
             namespace: istio-system
-            valuesFile: gitops/kustomize/overlays/dev/kiali/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/kiali/values-dev.yaml
   template:
     metadata:
       name: kiali-{{environment}}

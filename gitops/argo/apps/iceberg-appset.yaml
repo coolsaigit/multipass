@@ -11,13 +11,13 @@ spec:
         elements:
           - environment: dev
             namespace: iceberg
-            valuesFile: gitops/kustomize/overlays/dev/iceberg/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/iceberg/values-dev.yaml
           - environment: staging
             namespace: iceberg
-            valuesFile: gitops/kustomize/overlays/staging/iceberg/values-staging.yaml
+            valuesFile: ../../kustomize/overlays/staging/iceberg/values-staging.yaml
           - environment: prod
             namespace: iceberg
-            valuesFile: gitops/kustomize/overlays/prod/iceberg/values-prod.yaml
+            valuesFile: ../../kustomize/overlays/prod/iceberg/values-prod.yaml
   template:
     metadata:
       name: iceberg-{{environment}}

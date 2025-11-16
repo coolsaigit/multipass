@@ -11,13 +11,13 @@ spec:
         elements:
           - environment: dev
             namespace: redpanda
-            valuesFile: gitops/kustomize/overlays/dev/redpanda/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/redpanda/values-dev.yaml
           - environment: staging
             namespace: redpanda
-            valuesFile: gitops/kustomize/overlays/staging/redpanda/values-staging.yaml
+            valuesFile: ../../kustomize/overlays/staging/redpanda/values-staging.yaml
           - environment: prod
             namespace: redpanda
-            valuesFile: gitops/kustomize/overlays/prod/redpanda/values-prod.yaml
+            valuesFile: ../../kustomize/overlays/prod/redpanda/values-prod.yaml
   template:
     metadata:
       name: redpanda-{{environment}}

@@ -11,13 +11,13 @@ spec:
         elements:
           - environment: dev
             namespace: flink
-            valuesFile: gitops/kustomize/overlays/dev/flink/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/flink/values-dev.yaml
           - environment: staging
             namespace: flink
-            valuesFile: gitops/kustomize/overlays/staging/flink/values-staging.yaml
+            valuesFile: ../../kustomize/overlays/staging/flink/values-staging.yaml
           - environment: prod
             namespace: flink
-            valuesFile: gitops/kustomize/overlays/prod/flink/values-prod.yaml
+            valuesFile: ../../kustomize/overlays/prod/flink/values-prod.yaml
   template:
     metadata:
       name: flink-{{environment}}

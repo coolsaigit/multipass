@@ -11,7 +11,7 @@ spec:
         elements:
           - environment: dev
             namespace: monitoring
-            valuesFile: gitops/kustomize/overlays/dev/prometheus/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/prometheus/values-dev.yaml
   template:
     metadata:
       name: prometheus-{{environment}}

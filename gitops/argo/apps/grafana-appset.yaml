@@ -11,7 +11,7 @@ spec:
         elements:
           - environment: dev
             namespace: monitoring
-            valuesFile: gitops/kustomize/overlays/dev/grafana/values-dev.yaml
+            valuesFile: ../../kustomize/overlays/dev/grafana/values-dev.yaml
   template:
     metadata:
       name: grafana-{{environment}}
