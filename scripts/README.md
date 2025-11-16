@@ -45,7 +45,7 @@ Zero-touch deployment script that automates the entire GitOps setup.
 
 ### fix-endpoints.sh
 
-**Main script to fix and test all endpoints.** Use this when endpoints are not working.
+**Single script to fix and access all endpoints.**
 
 ```bash
 ./scripts/fix-endpoints.sh
@@ -57,33 +57,9 @@ Zero-touch deployment script that automates the entire GitOps setup.
 - Configures ArgoCD for insecure mode
 - Starts port-forward to Istio Gateway
 - Tests all 9 endpoints
-
-### access-all-services.sh
-
-**Access all services via Istio Gateway.** Use this when everything is working and you just need to access services.
-
-```bash
-./scripts/access-all-services.sh
-```
-
-**What it does:**
-- Starts port-forward to Istio Gateway
 - Shows all service URLs and access information
 - Displays ArgoCD credentials
-
-### show-endpoints.sh
-
-**Show endpoint information without starting port-forward.** Use this to see how to access services.
-
-```bash
-./scripts/show-endpoints.sh
-```
-
-**What it does:**
-- Shows Istio Gateway IP/address
-- Displays all service URLs
 - Provides /etc/hosts setup commands
-- Shows ArgoCD credentials
 
 ## Quick Reference
 
@@ -91,8 +67,6 @@ Zero-touch deployment script that automates the entire GitOps setup.
 |--------|---------|-------------|
 | `migrate-to-gitops.sh` | Full migration | Setting up from scratch |
 | `bootstrap.sh` | Deploy via GitOps | After migration or fresh install |
-| `fix-endpoints.sh` | Fix broken endpoints | Endpoints not working |
-| `access-all-services.sh` | Access services | Everything working, need access |
-| `show-endpoints.sh` | Show endpoint info | Need to see access URLs |
+| `fix-endpoints.sh` | Fix and access endpoints | Endpoints not working or need access |
 | `cleanup.sh` | Clean up deployments | Before migration or reset |
 
