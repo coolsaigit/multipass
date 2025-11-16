@@ -7,7 +7,7 @@ grafana:
   
   persistence:
     enabled: true
-    storageClassName: standard
+    storageClassName: ""  # Use default storage class (local-path)
     accessModes:
       - ReadWriteOnce
     size: 10Gi
