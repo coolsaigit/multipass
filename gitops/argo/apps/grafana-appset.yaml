@@ -12,7 +12,6 @@ spec:
           - environment: dev
             namespace: monitoring
             valuesFile: gitops/kustomize/overlays/dev/grafana/values-dev.yaml
-            prune: true
   template:
     metadata:
       name: grafana-{{environment}}
@@ -36,7 +35,6 @@ spec:
         namespace: "{{namespace}}"
       syncPolicy:
         automated:
-          prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true

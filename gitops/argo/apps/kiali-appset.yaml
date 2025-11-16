@@ -12,7 +12,6 @@ spec:
           - environment: dev
             namespace: istio-system
             valuesFile: gitops/kustomize/overlays/dev/kiali/values-dev.yaml
-            prune: true
   template:
     metadata:
       name: kiali-{{environment}}
@@ -36,7 +35,6 @@ spec:
         namespace: "{{namespace}}"
       syncPolicy:
         automated:
-          prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true

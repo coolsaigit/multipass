@@ -12,15 +12,12 @@ spec:
           - environment: dev
             namespace: starrocks
             valuesFile: gitops/kustomize/overlays/dev/starrocks/values-dev.yaml
-            prune: true
           - environment: staging
             namespace: starrocks
             valuesFile: gitops/kustomize/overlays/staging/starrocks/values-staging.yaml
-            prune: true
           - environment: prod
             namespace: starrocks
             valuesFile: gitops/kustomize/overlays/prod/starrocks/values-prod.yaml
-            prune: false
   template:
     metadata:
       name: starrocks-{{environment}}
@@ -44,7 +41,6 @@ spec:
         namespace: "{{namespace}}"
       syncPolicy:
         automated:
-          prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true

@@ -12,15 +12,12 @@ spec:
           - environment: dev
             namespace: minio
             valuesFile: gitops/kustomize/overlays/dev/minio/values-dev.yaml
-            prune: true
           - environment: staging
             namespace: minio
             valuesFile: gitops/kustomize/overlays/staging/minio/values-staging.yaml
-            prune: true
           - environment: prod
             namespace: minio
             valuesFile: gitops/kustomize/overlays/prod/minio/values-prod.yaml
-            prune: false
   template:
     metadata:
       name: minio-{{environment}}
@@ -44,7 +41,6 @@ spec:
         namespace: "{{namespace}}"
       syncPolicy:
         automated:
-          prune: true
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
