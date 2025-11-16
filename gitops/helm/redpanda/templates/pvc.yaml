@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redpanda-data
+  name: {{ .Release.Name }}-redpanda-data
   namespace: {{ .Values.namespace }}
 spec:
   accessModes:

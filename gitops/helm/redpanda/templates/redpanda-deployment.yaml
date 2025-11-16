@@ -75,6 +75,6 @@ spec:
       {{- if .Values.redpanda.persistence.enabled }}
       - name: data
         persistentVolumeClaim:
-          claimName: redpanda-data
+          claimName: {{ .Release.Name }}-redpanda-data
       {{- end }}
 
