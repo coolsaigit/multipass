@@ -29,7 +29,7 @@ data:
   iceberg.properties: |
     connector.name=iceberg
     iceberg.catalog.type=rest
-    iceberg.rest-catalog.uri=http://rest-catalog.{{ .Values.namespace }}:8181
+    iceberg.rest-catalog.uri=http://rest-catalog.{{ .Values.namespace }}.svc.cluster.local:8181
     iceberg.warehouse={{ .Values.restCatalog.env.warehouse }}
     iceberg.s3.endpoint={{ .Values.restCatalog.env.s3Endpoint }}
     iceberg.s3.path-style-access={{ .Values.restCatalog.env.s3PathStyleAccess }}
