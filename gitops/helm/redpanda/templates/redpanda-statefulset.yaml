@@ -31,6 +31,10 @@ spec:
         - internal://0.0.0.0:9092,external://0.0.0.0:19092
         - --advertise-kafka-addr
         - internal://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:9092,external://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:19092
+        {{- if gt (int .Values.redpanda.replicas) 1 }}
+        - --seed-servers
+        - redpanda-0.{{ .Values.namespace }}.svc.cluster.local:33145{{- range $i := until (int .Values.redpanda.replicas) }}{{- if gt $i 0 }},redpanda-{{ $i }}.{{ $.Values.namespace }}.svc.cluster.local:33145{{- end }}{{- end }}
+        {{- end }}
         - --pandaproxy-addr
         - internal://0.0.0.0:8082,external://0.0.0.0:18082
         - --advertise-pandaproxy-addr
