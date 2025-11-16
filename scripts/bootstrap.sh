@@ -216,11 +216,11 @@ echo -e "ArgoCD is installed and configured."
 echo -e "Applications will be deployed automatically via GitOps.\n"
 echo -e "${YELLOW}Next steps:${NC}"
 echo -e "1. Wait for Istio to deploy (check: kubectl get pods -n istio-system)"
-echo -e "2. Show all service endpoints: ${GREEN}./scripts/show-endpoints.sh${NC}"
+echo -e "2. Fix and access all endpoints: ${GREEN}./scripts/fix-endpoints.sh${NC}"
 echo -e "3. Access services via Istio Gateway (no port-forward needed!)"
 if [ -n "${ARGOCD_PASSWORD}" ]; then
     echo -e "4. ArgoCD credentials: admin / ${ARGOCD_PASSWORD}"
 fi
 echo -e "\n${GREEN}All done! 🚀${NC}"
-echo -e "${YELLOW}Run './scripts/show-endpoints.sh' to see all service URLs${NC}"
+echo -e "${YELLOW}Run './scripts/fix-endpoints.sh' to fix and access all endpoints${NC}"
 

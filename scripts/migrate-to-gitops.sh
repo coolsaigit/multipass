@@ -73,12 +73,12 @@ if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z "$REPLY" ]]; then
     echo -e "${GREEN}Running bootstrap script...${NC}\n"
     "${REPO_ROOT}"/scripts/bootstrap.sh
     
-    # Show all service endpoints
-    echo -e "\n${BLUE}=== Service Endpoints ===${NC}\n"
-    if [ -f "${REPO_ROOT}/scripts/show-endpoints.sh" ]; then
-        "${REPO_ROOT}"/scripts/show-endpoints.sh
+    # Fix and show all service endpoints
+    echo -e "\n${BLUE}=== Fixing and Accessing Endpoints ===${NC}\n"
+    if [ -f "${REPO_ROOT}/scripts/fix-endpoints.sh" ]; then
+        "${REPO_ROOT}"/scripts/fix-endpoints.sh
     else
-        echo -e "${YELLOW}show-endpoints.sh not found. Skipping endpoint display.${NC}"
+        echo -e "${YELLOW}fix-endpoints.sh not found. Skipping endpoint setup.${NC}"
     fi
 else
     echo -e "${YELLOW}Bootstrap cancelled. Run manually with: ./scripts/bootstrap.sh${NC}\n"

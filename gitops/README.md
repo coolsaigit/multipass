@@ -206,9 +206,9 @@ kubectl apply -k gitops/clusters/dev/
 
 After Istio is deployed, all services are accessible via the Istio Gateway (no port-forward needed!):
 
-**Quick Access - Show All Endpoints:**
+**Quick Access - Fix and Show All Endpoints:**
 ```bash
-./scripts/show-endpoints.sh
+./scripts/fix-endpoints.sh
 ```
 
 This script will:
@@ -238,9 +238,9 @@ This script will:
 
 2. **Access via Port-Forward** (if LoadBalancer not available):
    
-   **Recommended: Use unified access script** (handles all services via single port-forward):
+   **Recommended: Use fix-endpoints script** (handles all services via single port-forward):
    ```bash
-   ./scripts/access-all-services.sh
+   ./scripts/fix-endpoints.sh
    ```
    This script:
    - Starts a single port-forward to Istio Gateway (port 8080)
@@ -272,8 +272,8 @@ This script will:
 
 **Via Istio Gateway (Recommended):**
 ```bash
-# Use the show-endpoints script
-./scripts/show-endpoints.sh
+# Use the fix-endpoints script
+./scripts/fix-endpoints.sh
 
 # Or access directly
 # Add to /etc/hosts: <GATEWAY_IP> argocd.local
