@@ -1,7 +1,12 @@
 apiVersion: v2
 name: redpanda
-description: Redpanda Kafka-compatible streaming platform
+description: Redpanda Kafka-compatible streaming platform wrapper chart
 type: application
 version: 0.1.0
 appVersion: "latest"
+dependencies:
+  - name: redpanda
+    version: 25.1.2
+    repository: https://charts.redpanda.com
+    condition: redpanda.enabled
 

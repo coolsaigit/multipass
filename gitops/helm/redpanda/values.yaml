@@ -1,35 +1,54 @@
+# Wrapper chart values for official Redpanda Helm chart
+# Official chart: https://charts.redpanda.com
+# Documentation: https://docs.redpanda.com/current/deploy/redpanda/kubernetes/k-production-deployment/
+
 namespace: redpanda
 
-redpanda:
+# Official Redpanda chart configuration
+# The official chart handles cluster formation, seed servers, and all configuration automatically
+
+# Image configuration
+image:
+  repository: docker.redpanda.com/redpandadata/redpanda
+  tag: v25.2.11
+
+# StatefulSet configuration
+statefulset:
   replicas: 1
-  image:
-    repository: docker.redpanda.com/redpandadata/redpanda
-    tag: latest
-    pullPolicy: IfNotPresent
-  resources:
-    requests:
-      cpu: 500m
-      memory: 1Gi
-    limits:
-      cpu: 2000m
-      memory: 2Gi
-  persistence:
+
+# Resource configuration
+resources:
+  cpu:
+    cores: 1
+  memory:
+    container:
+      max: 1Gi
+
+# Storage configuration
+storage:
+  persistentVolume:
     enabled: true
-    storageClass: ""
-    accessMode: ReadWriteOnce
     size: 20Gi
 
+# Redpanda configuration
+config:
+  node:
+    developer_mode: true
+    empty_seed_starts_cluster: true
+
+# Console configuration
 console:
   enabled: true
-  image:
-    repository: docker.redpanda.com/redpandadata/console
-    tag: latest
-    pullPolicy: IfNotPresent
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
 
+# TLS disabled for dev
+tls:
+  enabled: false
+
+# Auth disabled for dev
+auth:
+  sasl:
+    enabled: false
+
+# External connectivity disabled
+external:
+  enabled: false

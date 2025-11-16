@@ -1,25 +1,30 @@
 # Development environment overrides for Redpanda Helm chart
 namespace: dev
 
-redpanda:
+# StatefulSet configuration for dev
+statefulset:
   replicas: 3
-  resources:
-    requests:
-      cpu: 250m
-      memory: 512Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-  persistence:
+
+# Resource configuration for dev
+resources:
+  cpu:
+    cores: 1
+  memory:
+    container:
+      max: 1Gi
+
+# Storage configuration for dev
+storage:
+  persistentVolume:
+    enabled: true
     size: 10Gi
 
+# Configuration for dev
+config:
+  node:
+    developer_mode: true
+    empty_seed_starts_cluster: false
+
+# Console configuration for dev
 console:
   enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 250m
-      memory: 256Mi
-
