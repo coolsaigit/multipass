@@ -105,4 +105,7 @@ fi
 
 echo -e "${YELLOW}Port-forward is running (PID: ${PF_PID})${NC}"
 echo -e "${YELLOW}To stop: pkill -f 'kubectl port-forward.*istio-ingressgateway'${NC}\n"
+echo -e "${RED}⚠️  IMPORTANT: Keep this port-forward running!${NC}"
+echo -e "${YELLOW}If it stops, endpoints will refuse connections.${NC}"
+echo -e "${YELLOW}To restart: ./scripts/fix-endpoints.sh${NC}\n"
 
