@@ -7,14 +7,7 @@ data:
   redpanda.yaml.template: |
     redpanda:
       data_directory: /var/lib/redpanda/data
-      {{- if gt (int .Values.redpanda.replicas) 1 }}
-      seed_servers:
-      {{- range $i := until (int .Values.redpanda.replicas) }}
-        - host:
-            address: redpanda-{{ $i }}.{{ $.Values.namespace }}.svc.cluster.local
-            port: 33145
-      {{- end }}
-      {{- end }}
+      # seed_servers will be added by init container for non-bootstrap nodes
       rpc_server:
         address: 0.0.0.0
         port: 33145
@@ -40,6 +33,30 @@ data:
           advertised_port: 8081
   generate-config.sh: |
     #!/bin/sh
-    sed "s/\${POD_NAME}/${POD_NAME}/g" /etc/redpanda/redpanda.yaml.template > /etc/redpanda/redpanda.yaml
+    set -e
+    # Replace POD_NAME placeholder
+    sed "s/\${POD_NAME}/${POD_NAME}/g" /etc/redpanda/redpanda.yaml.template > /tmp/redpanda.yaml
+    
+    # Extract pod index (e.g., redpanda-0 -> 0, redpanda-1 -> 1)
+    POD_INDEX=$(echo ${POD_NAME} | sed 's/.*-//')
+    
+    # Only add seed_servers for non-bootstrap nodes (pod index > 0)
+    if [ "$POD_INDEX" != "0" ]; then
+      # Create seed_servers section
+      SEED_SECTION="seed_servers:
+        - host:
+            address: redpanda-0.${NAMESPACE}.svc.cluster.local
+            port: 33145"
+      
+      # Insert seed_servers before rpc_server using awk
+      awk -v seed="$SEED_SECTION" '/rpc_server:/ {print seed; print ""} {print}' /tmp/redpanda.yaml > /tmp/redpanda.yaml.new
+      mv /tmp/redpanda.yaml.new /tmp/redpanda.yaml
+    fi
+    
+    # Move to final location
+    mv /tmp/redpanda.yaml /etc/redpanda/redpanda.yaml
+    
+    # Debug: show generated config
+    echo "Generated config for ${POD_NAME} (index: ${POD_INDEX}):"
     cat /etc/redpanda/redpanda.yaml
 
