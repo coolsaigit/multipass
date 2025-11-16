@@ -1,0 +1,47 @@
+# Multipass Service Endpoints - Sample /etc/hosts file
+# 
+# Instructions:
+# 1. Replace YOUR_GATEWAY_IP with your actual Istio Gateway IP/Address
+#    - For LoadBalancer: Use the EXTERNAL_IP from: kubectl get svc istio-ingressgateway -n istio-system
+#    - For NodePort: Use NODE_IP:NODE_PORT (e.g., 192.168.1.100:31380)
+#    - For ClusterIP: Use localhost (requires port-forward: kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80)
+#
+# 2. Run: sudo cp sample-etc-hosts.txt /etc/hosts
+#    OR manually add these lines to your /etc/hosts file
+#
+# 3. If using port-forward, use localhost:8080 with Host headers instead
+#
+# Get your Gateway IP by running: ./scripts/show-endpoints.sh
+
+# Replace YOUR_GATEWAY_IP below with your actual gateway IP/address
+# For example: 192.168.1.100 or 192.168.1.100:31380 (NodePort) or localhost (port-forward)
+
+YOUR_GATEWAY_IP argocd.local
+YOUR_GATEWAY_IP redpanda-console.local
+YOUR_GATEWAY_IP grafana.local
+YOUR_GATEWAY_IP kiali.local
+YOUR_GATEWAY_IP minio.local
+YOUR_GATEWAY_IP flink.local
+YOUR_GATEWAY_IP starrocks.local
+YOUR_GATEWAY_IP trino.local
+YOUR_GATEWAY_IP prometheus.local
+
+# Example entries (replace with your actual IP):
+# 192.168.1.100 argocd.local
+# 192.168.1.100 redpanda-console.local
+# 192.168.1.100 grafana.local
+# 192.168.1.100 kiali.local
+# 192.168.1.100 minio.local
+# 192.168.1.100 flink.local
+# 192.168.1.100 starrocks.local
+# 192.168.1.100 trino.local
+# 192.168.1.100 prometheus.local
+
+# For NodePort (if using NodePort instead of LoadBalancer):
+# NODE_IP:NODE_PORT argocd.local
+# Example: 192.168.1.100:31380 argocd.local
+
+# For port-forward (if using ClusterIP):
+# 127.0.0.1 argocd.local
+# Then access via: http://argocd.local:8080
+
