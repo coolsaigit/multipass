@@ -21,12 +21,15 @@ if [ -n "${EXTERNAL_IP}" ]; then
     GATEWAY_IP="${EXTERNAL_IP}"
     ACCESS_METHOD="LoadBalancer"
 elif [ -n "${NODE_PORT}" ]; then
-    NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || echo "YOUR_NODE_IP")
-    GATEWAY_IP="${NODE_IP}:${NODE_PORT}"
-    ACCESS_METHOD="NodePort"
+    # Get only IPv4 address (first one)
+    NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null | awk '{print $1}' || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null | awk '{print $1}' || echo "YOUR_NODE_IP")
+    GATEWAY_IP="${NODE_IP}"
+    ACCESS_METHOD="NodePort (port ${NODE_PORT})"
+    PORT_NOTE=":${NODE_PORT}"
 else
     GATEWAY_IP="127.0.0.1"
     ACCESS_METHOD="Port-Forward (localhost:8080)"
+    PORT_NOTE=":8080"
 fi
 
 echo -e "${YELLOW}Gateway IP: ${GATEWAY_IP}${NC}"
@@ -50,18 +53,21 @@ else
 fi
 
 echo -e "${GREEN}All services are now accessible via:${NC}"
-echo -e "  http://argocd.local"
-echo -e "  http://redpanda-console.local"
-echo -e "  http://grafana.local"
-echo -e "  http://kiali.local"
-echo -e "  http://minio.local"
-echo -e "  http://flink.local"
-echo -e "  http://starrocks.local"
-echo -e "  http://trino.local"
-echo -e "  http://prometheus.local"
+echo -e "  http://argocd.local${PORT_NOTE:-}"
+echo -e "  http://redpanda-console.local${PORT_NOTE:-}"
+echo -e "  http://grafana.local${PORT_NOTE:-}"
+echo -e "  http://kiali.local${PORT_NOTE:-}"
+echo -e "  http://minio.local${PORT_NOTE:-}"
+echo -e "  http://flink.local${PORT_NOTE:-}"
+echo -e "  http://starrocks.local${PORT_NOTE:-}"
+echo -e "  http://trino.local${PORT_NOTE:-}"
+echo -e "  http://prometheus.local${PORT_NOTE:-}"
 if [ "${ACCESS_METHOD}" = "Port-Forward (localhost:8080)" ]; then
     echo -e "\n${YELLOW}Note: Using port-forward. Access via: http://<hostname>.local:8080${NC}"
     echo -e "${YELLOW}Start port-forward: kubectl port-forward svc/${ISTIO_SVC} -n ${ISTIO_NAMESPACE} 8080:80${NC}"
+elif [ -n "${NODE_PORT}" ] && [ "${ACCESS_METHOD}" = "NodePort (port ${NODE_PORT})" ]; then
+    echo -e "\n${YELLOW}Note: Using NodePort. Access via: http://<hostname>.local:${NODE_PORT}${NC}"
+    echo -e "${YELLOW}Or configure your Istio Gateway to use port 80 and access without port${NC}"
 fi
 echo ""
 
