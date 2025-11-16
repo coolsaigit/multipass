@@ -1,0 +1,59 @@
+# Grafana Configuration
+grafana:
+  enabled: true
+  
+  adminUser: admin
+  adminPassword: admin  # Change in production!
+  
+  persistence:
+    enabled: true
+    storageClassName: standard
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  service:
+    type: ClusterIP
+    port: 3000
+  
+  # Data sources
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://kube-prometheus-stack-prometheus.monitoring:9090
+          isDefault: true
+          editable: true
+        - name: Istio
+          type: prometheus
+          access: proxy
+          url: http://kube-prometheus-stack-prometheus.monitoring:9090
+          editable: true
+  
+  # Dashboards
+  dashboards:
+    default:
+      istio:
+        gnetId: 13105
+        revision: 1
+        datasource: Prometheus
+      istio-service-dashboard:
+        gnetId: 13105
+        revision: 1
+        datasource: Prometheus
+      istio-workload-dashboard:
+        gnetId: 13105
+        revision: 1
+        datasource: Prometheus
+

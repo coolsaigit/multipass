@@ -1,0 +1,36 @@
+# Istiod (Control Plane)
+istiod:
+  _internal_defaults_do_not_set:
+    global:
+      istioNamespace: istio-system
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# Istio Gateway (Ingress)
+gateway:
+  _internal_defaults_do_not_set:
+    name: istio-ingressgateway
+    service:
+      type: LoadBalancer
+      ports:
+        - name: http2
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        - name: https
+          port: 443
+          protocol: TCP
+          targetPort: 443
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+

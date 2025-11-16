@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: grafana
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  generators:
+    - list:
+        elements:
+          - environment: dev
+            namespace: monitoring
+            valuesFile: gitops/kustomize/overlays/dev/grafana/values-dev.yaml
+            prune: true
+  template:
+    metadata:
+      name: grafana-{{environment}}
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-wave: "3"
+    spec:
+      project: multipass
+      source:
+        repoURL: https://github.com/coolsaigit/multipass.git
+        targetRevision: main
+        path: gitops/helm/grafana
+        helm:
+          valueFiles:
+            - values.yaml
+            - "{{valuesFile}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{namespace}}"
+      syncPolicy:
+        automated:
+          prune: {{prune}}
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+

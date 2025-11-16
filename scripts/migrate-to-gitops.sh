@@ -65,12 +65,21 @@ esac
 # Step 3: Run bootstrap
 echo -e "${YELLOW}Step 3: Deploying via GitOps${NC}"
 echo -e "Ready to run bootstrap script? This will install ArgoCD and deploy all applications.${NC}"
-read -p "Continue? (yes/no): " -r
+read -p "Continue? [Y/n]: " -r
+REPLY=${REPLY:-Y}  # Default to Y if empty
 echo ""
 
-if [[ $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
+if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z "$REPLY" ]]; then
     echo -e "${GREEN}Running bootstrap script...${NC}\n"
     "${REPO_ROOT}"/scripts/bootstrap.sh
+    
+    # Show all service endpoints
+    echo -e "\n${BLUE}=== Service Endpoints ===${NC}\n"
+    if [ -f "${REPO_ROOT}/scripts/show-endpoints.sh" ]; then
+        "${REPO_ROOT}"/scripts/show-endpoints.sh
+    else
+        echo -e "${YELLOW}show-endpoints.sh not found. Skipping endpoint display.${NC}"
+    fi
 else
     echo -e "${YELLOW}Bootstrap cancelled. Run manually with: ./scripts/bootstrap.sh${NC}\n"
 fi

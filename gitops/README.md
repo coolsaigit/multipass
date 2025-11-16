@@ -9,12 +9,17 @@ gitops/
 ├── argo/
 │   ├── apps/                 # ArgoCD ApplicationSets (per app)
 │   │   ├── argocd-bootstrap.yaml  # Bootstrap Application (self-management)
+│   │   ├── istio-appset.yaml      # Istio service mesh (sync-wave: 1)
+│   │   ├── istio-gateway-appset.yaml  # Istio Gateway/VirtualServices (sync-wave: 2)
+│   │   ├── prometheus-appset.yaml # Prometheus monitoring (sync-wave: 2)
+│   │   ├── grafana-appset.yaml    # Grafana visualization (sync-wave: 3)
+│   │   ├── kiali-appset.yaml      # Kiali observability (sync-wave: 3)
 │   │   ├── minio-appset.yaml      # ApplicationSet (generates apps for dev/staging/prod)
 │   │   ├── redpanda-appset.yaml  # ApplicationSet (generates apps for dev/staging/prod)
 │   │   ├── flink-appset.yaml      # ApplicationSet (generates apps for dev/staging/prod)
 │   │   ├── starrocks-appset.yaml  # ApplicationSet (generates apps for dev/staging/prod)
 │   │   ├── iceberg-appset.yaml   # ApplicationSet (generates apps for dev/staging/prod)
-│   │   └── app-of-apps.yaml
+│   │   └── app-of-apps.yaml      # Root application (sync-wave: 2)
 │   ├── projects/             # ArgoCD project-level RBAC & scoping
 │   │   └── multipass-project.yaml
 │   └── bootstrap/            # Install ArgoCD itself (optional)
@@ -22,15 +27,32 @@ gitops/
 │
 ├── helm/                     # Helm charts (all apps)
 │   ├── argocd/              # ArgoCD installation chart
+│   ├── istio/               # Istio service mesh
+│   ├── prometheus/          # Prometheus monitoring
+│   ├── grafana/             # Grafana visualization
+│   ├── kiali/               # Kiali service mesh observability
 │   ├── minio/
 │   ├── redpanda/
 │   ├── flink/
 │   ├── starrocks/
 │   └── iceberg/
 │
+├── istio/                    # Istio Gateway and VirtualServices
+│   ├── gateway.yaml
+│   ├── kustomization.yaml
+│   └── virtualservices/
+│       ├── argocd-vs.yaml
+│       ├── redpanda-console-vs.yaml
+│       ├── kiali-vs.yaml
+│       └── grafana-vs.yaml
+│
 └── kustomize/
     └── overlays/             # Environment-specific Helm values overrides
         ├── dev/
+        │   ├── istio/values-dev.yaml
+        │   ├── prometheus/values-dev.yaml
+        │   ├── grafana/values-dev.yaml
+        │   ├── kiali/values-dev.yaml
         │   ├── minio/values-dev.yaml
         │   ├── redpanda/values-dev.yaml
         │   ├── flink/values-dev.yaml
@@ -60,7 +82,15 @@ gitops/
 
 ## Architecture Overview
 
-### Helm Charts (All Apps)
+### Infrastructure & Observability (Managed by ArgoCD)
+- **Istio**: Service mesh for traffic management, security, and observability
+  - Gateway: Ingress controller for all services
+  - VirtualServices: Routing rules for ArgoCD, Redpanda Console, Grafana, Kiali
+- **Prometheus**: Metrics collection and alerting
+- **Grafana**: Visualization and dashboards (pre-configured with Prometheus and Istio dashboards)
+- **Kiali**: Service mesh observability and management UI
+
+### Application Helm Charts
 - **MinIO**: S3-compatible object storage
 - **Redpanda**: Kafka-compatible streaming platform
 - **Flink**: Stream processing engine
@@ -68,6 +98,12 @@ gitops/
 - **Iceberg**: Data lake format with REST catalog and Trino query engine
 
 All apps use Helm charts with environment-specific values files in `kustomize/overlays/{env}/{app}/values-{env}.yaml`
+
+### Deployment Order (Sync Waves)
+1. **Wave 0**: ArgoCD project (bootstrap)
+2. **Wave 1**: Istio service mesh (infrastructure)
+3. **Wave 2**: Istio Gateway/VirtualServices, Prometheus, App of Apps
+4. **Wave 3**: Grafana, Kiali, Applications
 
 ### ArgoCD (GitOps)
 - **App of Apps Pattern**: Single root application manages all child applications
@@ -80,10 +116,12 @@ All apps use Helm charts with environment-specific values files in `kustomize/ov
 
 1. **Kubernetes Cluster** (k3s, EKS, GKE, AKS, etc.)
 2. **kubectl** configured to access your cluster
-3. **Helm** v3.x installed (for bootstrap script)
+3. **Helm** v3.x (auto-installed by bootstrap script on macOS/Linux if missing)
 4. **kustomize** CLI (optional, for local testing)
 
-**Note**: ArgoCD will be installed automatically by the bootstrap script.
+**Note**: 
+- ArgoCD will be installed automatically by the bootstrap script
+- Helm will be auto-installed if missing (requires Homebrew on macOS, or sudo access on Linux)
 
 ## Quick Start (Zero-Touch Bootstrap)
 
@@ -143,6 +181,13 @@ kubectl apply -f gitops/argo/apps/app-of-apps.yaml
 
 **Option B: Individual ApplicationSets**
 ```bash
+# Deploy infrastructure and observability first
+kubectl apply -f gitops/argo/apps/istio-appset.yaml
+kubectl apply -f gitops/argo/apps/istio-gateway-appset.yaml
+kubectl apply -f gitops/argo/apps/prometheus-appset.yaml
+kubectl apply -f gitops/argo/apps/grafana-appset.yaml
+kubectl apply -f gitops/argo/apps/kiali-appset.yaml
+
 # Deploy all apps via ApplicationSets (generates Applications for all environments)
 kubectl apply -f gitops/argo/apps/minio-appset.yaml
 kubectl apply -f gitops/argo/apps/redpanda-appset.yaml
@@ -157,17 +202,83 @@ kubectl apply -f gitops/argo/apps/iceberg-appset.yaml
 kubectl apply -k gitops/clusters/dev/
 ```
 
+### Access Services via Istio Ingress
+
+After Istio is deployed, all services are accessible via the Istio Gateway (no port-forward needed!):
+
+**Quick Access - Show All Endpoints:**
+```bash
+./scripts/show-endpoints.sh
+```
+
+This script will:
+- Show the Istio Gateway IP/address
+- Display all service URLs
+- Provide commands to access each service
+- Show how to update `/etc/hosts` for easy access
+
+**Service URLs** (via Istio Gateway):
+- **ArgoCD**: `http://argocd.local`
+- **Redpanda Console**: `http://redpanda-console.local`
+- **Grafana**: `http://grafana.local`
+- **Kiali**: `http://kiali.local`
+
+**Important Setup Steps**:
+
+1. **Configure ArgoCD for Insecure Mode** (required when behind Istio):
+   ```bash
+   kubectl patch configmap argocd-cmd-params-cm -n argocd --type merge -p '{"data":{"server.insecure":"true"}}'
+   kubectl rollout restart deployment argocd-server -n argocd
+   ```
+   Or apply the ConfigMap from GitOps:
+   ```bash
+   kubectl apply -f gitops/istio/argocd-config/configmap.yaml
+   kubectl rollout restart deployment argocd-server -n argocd
+   ```
+
+2. **Access via Port-Forward** (if LoadBalancer not available):
+   ```bash
+   kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
+   ```
+   Then access: `http://localhost:8080` with Host header `argocd.local` or use:
+   ```bash
+   curl -H "Host: argocd.local" http://localhost:8080
+   ```
+
+3. **Update /etc/hosts** (for local access):
+   ```bash
+   # Get Istio Gateway IP
+   ISTIO_IP=$(kubectl get svc istio-ingressgateway -n istio-system -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+   # If no LoadBalancer, use port-forward method above
+   
+   # Add to /etc/hosts
+   echo "$ISTIO_IP argocd.local redpanda-console.local grafana.local kiali.local" | sudo tee -a /etc/hosts
+   ```
+
 ### Access ArgoCD UI
 
+**Via Istio Gateway (Recommended):**
 ```bash
-# Port forward to access ArgoCD UI
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+# Use the show-endpoints script
+./scripts/show-endpoints.sh
+
+# Or access directly
+# Add to /etc/hosts: <GATEWAY_IP> argocd.local
+# Then open: http://argocd.local
+```
+
+**Direct Access (Bypass Istio - if needed):**
+```bash
+# Port forward to access ArgoCD UI directly
+kubectl port-forward svc/argocd-server -n argocd 8443:443
 
 # Get admin password
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
 
-Access ArgoCD at: https://localhost:8080 (username: `admin`)
+Access ArgoCD at: https://localhost:8443 (username: `admin`)
+
+**Note**: ArgoCD must be configured for insecure mode when behind Istio. This is handled automatically by the `argocd-config/configmap.yaml` in the Istio Gateway ApplicationSet.
 
 ## Local Testing (Without ArgoCD)
 
@@ -222,10 +333,15 @@ kubectl apply -k gitops/kustomize/overlays/prod/iceberg/
 ### Modifying Helm Values
 
 **Base values** (common across all environments):
+- `gitops/helm/istio/values.yaml`
+- `gitops/helm/prometheus/values.yaml`
+- `gitops/helm/grafana/values.yaml`
+- `gitops/helm/kiali/values.yaml`
 - `gitops/helm/minio/values.yaml`
 - `gitops/helm/redpanda/values.yaml`
 - `gitops/helm/flink/values.yaml`
 - `gitops/helm/starrocks/values.yaml`
+- `gitops/helm/iceberg/values.yaml`
 
 **Environment-specific overrides**:
 - `gitops/kustomize/overlays/{dev,staging,prod}/{app}/values-{env}.yaml`
@@ -277,6 +393,28 @@ Example: The Iceberg ApplicationSet generates:
 - `iceberg-staging` → uses `helm/iceberg/values.yaml` + `overlays/staging/iceberg/values-staging.yaml`
 - `iceberg-prod` → uses `helm/iceberg/values.yaml` + `overlays/prod/iceberg/values-prod.yaml` (manual approval)
 
+## Observability Stack
+
+### Prometheus
+- **Metrics Collection**: Collects metrics from all services and Istio
+- **Retention**: 30 days (production), 7 days (dev)
+- **Storage**: Persistent volumes for metrics data
+- **Access**: Via Grafana dashboards
+
+### Grafana
+- **Pre-configured Dashboards**: 
+  - Istio Service Dashboard
+  - Istio Workload Dashboard
+  - General Istio Dashboard
+- **Data Sources**: Prometheus (default)
+- **Access**: `http://grafana.local` via Istio Gateway (default: admin/admin)
+
+### Kiali
+- **Service Mesh Visualization**: Interactive graph of service mesh topology
+- **Traffic Management**: View and manage traffic flows
+- **Metrics Integration**: Connected to Prometheus
+- **Access**: `http://kiali.local` via Istio Gateway
+
 ## Best Practices
 
 1. **Never commit secrets**: Use Sealed Secrets, External Secrets Operator, or Vault
@@ -286,8 +424,51 @@ Example: The Iceberg ApplicationSet generates:
 5. **Use App of Apps pattern**: Simplifies management of multiple applications
 6. **Use ApplicationSets for multi-environment apps**: Reduces duplication and scales better
 7. **Regular sync policies**: Configure retry and backoff strategies
+8. **Istio for ingress**: Use Istio Gateway instead of port-forwarding for production access
+9. **Observability first**: Deploy monitoring (Prometheus/Grafana) before applications
+10. **Service mesh benefits**: Leverage Istio for traffic management, security, and observability
 
 ## Troubleshooting
+
+### Cannot Access Services via Istio Gateway
+
+**Issue**: `http://argocd.local` not accessible
+
+**Solutions**:
+
+1. **Verify Istio is deployed**:
+   ```bash
+   kubectl get pods -n istio-system
+   kubectl get svc istio-ingressgateway -n istio-system
+   ```
+
+2. **Check Gateway and VirtualService**:
+   ```bash
+   kubectl get gateway -n istio-system
+   kubectl get virtualservice -A
+   ```
+
+3. **Verify ArgoCD is in insecure mode**:
+   ```bash
+   kubectl get configmap argocd-cmd-params-cm -n argocd -o yaml | grep insecure
+   # Should show: server.insecure: "true"
+   ```
+   If not set, apply:
+   ```bash
+   kubectl apply -f gitops/istio/argocd-config/configmap.yaml
+   kubectl rollout restart deployment argocd-server -n argocd
+   ```
+
+4. **Test with port-forward**:
+   ```bash
+   kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
+   curl -H "Host: argocd.local" http://localhost:8080
+   ```
+
+5. **Check Istio Gateway logs**:
+   ```bash
+   kubectl logs -n istio-system -l istio=ingressgateway --tail=50
+   ```
 
 ### ArgoCD Application Not Syncing
 

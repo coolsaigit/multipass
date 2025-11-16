@@ -1,0 +1,33 @@
+# Kiali Configuration
+kiali-server:
+  enabled: true
+  
+  auth:
+    strategy: anonymous  # Change to openshift/ldap/oidc for production
+  
+  deployment:
+    namespace: istio-system
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  
+  server:
+    web_root: /
+    port: 20001
+  
+  external_services:
+    prometheus:
+      url: http://kube-prometheus-stack-prometheus.monitoring:9090
+    grafana:
+      enabled: true
+      url: http://grafana.monitoring:3000
+      in_cluster_url: http://grafana.monitoring:3000
+  
+  service:
+    type: ClusterIP
+    port: 20001
+
