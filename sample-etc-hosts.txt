@@ -43,5 +43,14 @@ YOUR_GATEWAY_IP prometheus.local
 
 # For port-forward (if using ClusterIP):
 # 127.0.0.1 argocd.local
-# Then access via: http://argocd.local:8080
+# 127.0.0.1 redpanda-console.local
+# 127.0.0.1 grafana.local
+# 127.0.0.1 kiali.local
+# 127.0.0.1 minio.local
+# 127.0.0.1 flink.local
+# 127.0.0.1 starrocks.local
+# 127.0.0.1 trino.local
+# 127.0.0.1 prometheus.local
+# Then access via: http://<hostname>.local:8080
+# IMPORTANT: Start port-forward first: kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 
