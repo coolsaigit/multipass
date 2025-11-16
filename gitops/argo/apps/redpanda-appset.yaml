@@ -3,6 +3,8 @@ kind: ApplicationSet
 metadata:
   name: redpanda
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   generators:
     - list:
@@ -25,6 +27,8 @@ spec:
       namespace: argocd
       finalizers:
         - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-wave: "3"
     spec:
       project: multipass
       source:
