@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: flink-jobmanager
+            host: flink-jobmanager.flink.svc.cluster.local
             port:
               number: 8081
 

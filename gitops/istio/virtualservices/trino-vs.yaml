@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: trino
+            host: trino.iceberg.svc.cluster.local
             port:
               number: 8080
 

@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: kiali
+            host: kiali.istio-system.svc.cluster.local
             port:
               number: 20001
 

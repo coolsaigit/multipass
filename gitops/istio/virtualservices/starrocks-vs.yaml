@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: starrocks-fe
+            host: starrocks-fe.starrocks.svc.cluster.local
             port:
               number: 8030
 
