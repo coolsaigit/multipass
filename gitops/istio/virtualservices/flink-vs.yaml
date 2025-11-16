@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: flink
+  namespace: flink
+spec:
+  hosts:
+    - flink.local
+    - flink
+  gateways:
+    - istio-system/multipass-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: flink-jobmanager
+            port:
+              number: 8081
+

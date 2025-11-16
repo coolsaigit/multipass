@@ -97,11 +97,36 @@ echo -e "  URL: ${GATEWAY_URL} (Host: kiali.local)"
 echo -e "  Command: ${BLUE}curl -H \"Host: kiali.local\" ${GATEWAY_URL}${NC}"
 echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} kiali.local\n"
 
+echo -e "${GREEN}MinIO Console:${NC}"
+echo -e "  URL: ${GATEWAY_URL} (Host: minio.local)"
+echo -e "  Command: ${BLUE}curl -H \"Host: minio.local\" ${GATEWAY_URL}${NC}"
+echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} minio.local\n"
+
+echo -e "${GREEN}Flink:${NC}"
+echo -e "  URL: ${GATEWAY_URL} (Host: flink.local)"
+echo -e "  Command: ${BLUE}curl -H \"Host: flink.local\" ${GATEWAY_URL}${NC}"
+echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} flink.local\n"
+
+echo -e "${GREEN}StarRocks:${NC}"
+echo -e "  URL: ${GATEWAY_URL} (Host: starrocks.local)"
+echo -e "  Command: ${BLUE}curl -H \"Host: starrocks.local\" ${GATEWAY_URL}${NC}"
+echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} starrocks.local\n"
+
+echo -e "${GREEN}Trino:${NC}"
+echo -e "  URL: ${GATEWAY_URL} (Host: trino.local)"
+echo -e "  Command: ${BLUE}curl -H \"Host: trino.local\" ${GATEWAY_URL}${NC}"
+echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} trino.local\n"
+
+echo -e "${GREEN}Prometheus:${NC}"
+echo -e "  URL: ${GATEWAY_URL} (Host: prometheus.local)"
+echo -e "  Command: ${BLUE}curl -H \"Host: prometheus.local\" ${GATEWAY_URL}${NC}"
+echo -e "  Or add to /etc/hosts: ${GATEWAY_IP} prometheus.local\n"
+
 # Quick setup for /etc/hosts
 echo -e "${YELLOW}Quick Setup (/etc/hosts):${NC}"
 if [ "${ACCESS_METHOD}" != "ClusterIP (use port-forward)" ]; then
     echo -e "  Run this command to add all endpoints to /etc/hosts:"
-    echo -e "  ${BLUE}echo \"${GATEWAY_IP} argocd.local redpanda-console.local grafana.local kiali.local\" | sudo tee -a /etc/hosts${NC}\n"
+    echo -e "  ${BLUE}echo \"${GATEWAY_IP} argocd.local redpanda-console.local grafana.local kiali.local minio.local flink.local starrocks.local trino.local prometheus.local\" | sudo tee -a /etc/hosts${NC}\n"
 else
     echo -e "  ${YELLOW}Note: Using port-forward. Access via localhost:8080 with Host headers.${NC}\n"
 fi

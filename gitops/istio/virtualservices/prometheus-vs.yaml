@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: prometheus
+  namespace: monitoring
+spec:
+  hosts:
+    - prometheus.local
+    - prometheus
+  gateways:
+    - istio-system/multipass-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: prometheus-dev-kube-promet-prometheus
+            port:
+              number: 9090
+

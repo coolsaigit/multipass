@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  hosts:
+    - minio.local
+    - minio
+  gateways:
+    - istio-system/multipass-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: minio
+            port:
+              number: 9001
+

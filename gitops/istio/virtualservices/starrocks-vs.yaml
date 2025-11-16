@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: starrocks
+  namespace: starrocks
+spec:
+  hosts:
+    - starrocks.local
+    - starrocks
+  gateways:
+    - istio-system/multipass-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: starrocks-fe
+            port:
+              number: 8030
+

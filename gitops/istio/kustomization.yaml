@@ -7,5 +7,10 @@ resources:
   - virtualservices/redpanda-console-vs.yaml
   - virtualservices/kiali-vs.yaml
   - virtualservices/grafana-vs.yaml
+  - virtualservices/minio-vs.yaml
+  - virtualservices/flink-vs.yaml
+  - virtualservices/starrocks-vs.yaml
+  - virtualservices/trino-vs.yaml
+  - virtualservices/prometheus-vs.yaml
   - argocd-config/configmap.yaml
 
