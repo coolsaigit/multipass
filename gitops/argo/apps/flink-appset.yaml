@@ -12,15 +12,15 @@ spec:
           - environment: dev
             namespace: dev
             valuesFile: ../../kustomize/overlays/dev/flink/values-dev.yaml
-          - environment: test
-            namespace: test
-            valuesFile: ../../kustomize/overlays/test/flink/values-test.yaml
-          - environment: staging
-            namespace: staging
-            valuesFile: ../../kustomize/overlays/staging/flink/values-staging.yaml
-          - environment: prod
-            namespace: prod
-            valuesFile: ../../kustomize/overlays/prod/flink/values-prod.yaml
+          # - environment: test
+          #   namespace: test
+          #   valuesFile: ../../kustomize/overlays/test/flink/values-test.yaml
+          # - environment: staging
+          #   namespace: staging
+          #   valuesFile: ../../kustomize/overlays/staging/flink/values-staging.yaml
+          # - environment: prod
+          #   namespace: prod
+          #   valuesFile: ../../kustomize/overlays/prod/flink/values-prod.yaml
   template:
     metadata:
       name: flink-{{environment}}

@@ -12,15 +12,15 @@ spec:
           - environment: dev
             namespace: dev
             valuesFile: ../../kustomize/overlays/dev/minio/values-dev.yaml
-          - environment: test
-            namespace: test
-            valuesFile: ../../kustomize/overlays/test/minio/values-test.yaml
-          - environment: staging
-            namespace: staging
-            valuesFile: ../../kustomize/overlays/staging/minio/values-staging.yaml
-          - environment: prod
-            namespace: prod
-            valuesFile: ../../kustomize/overlays/prod/minio/values-prod.yaml
+          # - environment: test
+          #   namespace: test
+          #   valuesFile: ../../kustomize/overlays/test/minio/values-test.yaml
+          # - environment: staging
+          #   namespace: staging
+          #   valuesFile: ../../kustomize/overlays/staging/minio/values-staging.yaml
+          # - environment: prod
+          #   namespace: prod
+          #   valuesFile: ../../kustomize/overlays/prod/minio/values-prod.yaml
   template:
     metadata:
       name: minio-{{environment}}

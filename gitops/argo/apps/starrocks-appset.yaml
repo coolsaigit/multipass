@@ -12,15 +12,15 @@ spec:
           - environment: dev
             namespace: dev
             valuesFile: ../../kustomize/overlays/dev/starrocks/values-dev.yaml
-          - environment: test
-            namespace: test
-            valuesFile: ../../kustomize/overlays/test/starrocks/values-test.yaml
-          - environment: staging
-            namespace: staging
-            valuesFile: ../../kustomize/overlays/staging/starrocks/values-staging.yaml
-          - environment: prod
-            namespace: prod
-            valuesFile: ../../kustomize/overlays/prod/starrocks/values-prod.yaml
+          # - environment: test
+          #   namespace: test
+          #   valuesFile: ../../kustomize/overlays/test/starrocks/values-test.yaml
+          # - environment: staging
+          #   namespace: staging
+          #   valuesFile: ../../kustomize/overlays/staging/starrocks/values-staging.yaml
+          # - environment: prod
+          #   namespace: prod
+          #   valuesFile: ../../kustomize/overlays/prod/starrocks/values-prod.yaml
   template:
     metadata:
       name: starrocks-{{environment}}
