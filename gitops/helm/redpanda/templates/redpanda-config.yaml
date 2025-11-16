@@ -35,7 +35,7 @@ data:
     #!/bin/sh
     set -e
     # Replace POD_NAME placeholder
-    sed "s/\${POD_NAME}/${POD_NAME}/g" /etc/redpanda/redpanda.yaml.template > /tmp/redpanda.yaml
+    sed "s/\${POD_NAME}/${POD_NAME}/g" /etc/redpanda-template/redpanda.yaml.template > /tmp/redpanda.yaml
     
     # Extract pod index (e.g., redpanda-0 -> 0, redpanda-1 -> 1)
     POD_INDEX=$(echo ${POD_NAME} | sed 's/.*-//')
@@ -53,8 +53,8 @@ data:
       mv /tmp/redpanda.yaml.new /tmp/redpanda.yaml
     fi
     
-    # Move to final location
-    mv /tmp/redpanda.yaml /etc/redpanda/redpanda.yaml
+    # Copy to final location (emptyDir volume is writable)
+    cp /tmp/redpanda.yaml /etc/redpanda/redpanda.yaml
     
     # Debug: show generated config
     echo "Generated config for ${POD_NAME} (index: ${POD_INDEX}):"

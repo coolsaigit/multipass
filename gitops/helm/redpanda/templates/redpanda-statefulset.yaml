@@ -30,7 +30,10 @@ spec:
         - name: NAMESPACE
           value: {{ .Values.namespace }}
         volumeMounts:
-        - name: config
+        - name: config-template
+          mountPath: /etc/redpanda-template
+          readOnly: true
+        - name: config-generated
           mountPath: /etc/redpanda
       containers:
       - name: redpanda
@@ -73,7 +76,10 @@ spec:
         - containerPort: 33145
           name: rpc
         volumeMounts:
-        - name: config
+        - name: config-template
+          mountPath: /etc/redpanda-template
+          readOnly: true
+        - name: config-generated
           mountPath: /etc/redpanda
         {{- if .Values.redpanda.persistence.enabled }}
         - name: data
@@ -82,9 +88,11 @@ spec:
         resources:
           {{- toYaml .Values.redpanda.resources | nindent 10 }}
       volumes:
-      - name: config
+      - name: config-template
         configMap:
           name: redpanda-config
+      - name: config-generated
+        emptyDir: {}
   {{- if .Values.redpanda.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
