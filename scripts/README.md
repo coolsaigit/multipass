@@ -1,6 +1,8 @@
-# Bootstrap Scripts
+# Multipass Scripts
 
-## migrate-to-gitops.sh (Recommended)
+## Deployment Scripts
+
+### migrate-to-gitops.sh (Recommended)
 
 **Complete migration script** that handles the entire process:
 1. Checks/updates Git repository URL
@@ -11,7 +13,7 @@
 ./scripts/migrate-to-gitops.sh
 ```
 
-## cleanup.sh
+### cleanup.sh
 
 Cleans up existing deployments before migrating to GitOps.
 
@@ -23,47 +25,74 @@ Cleans up existing deployments before migrating to GitOps.
 ./scripts/cleanup.sh --preserve-data
 ```
 
-## bootstrap.sh
+### bootstrap.sh
 
 Zero-touch deployment script that automates the entire GitOps setup.
-
-### Usage
 
 ```bash
 ./scripts/bootstrap.sh
 ```
 
-### What it does
+**What it does:**
+1. Checks prerequisites (kubectl, auto-installs Helm if needed)
+2. Adds ArgoCD Helm repo
+3. Installs ArgoCD
+4. Creates ArgoCD project
+5. Creates bootstrap Application
+6. Creates App of Apps
 
-1. **Checks prerequisites**: Verifies kubectl is installed, auto-installs Helm if missing (macOS/Linux)
-2. **Adds ArgoCD Helm repo**: Adds the official ArgoCD Helm repository
-3. **Installs ArgoCD**: Installs ArgoCD using Helm
-4. **Waits for readiness**: Ensures ArgoCD is fully operational
-5. **Retrieves admin password**: Gets the initial admin password
-6. **Creates ArgoCD project**: Applies the multipass project configuration
-7. **Creates bootstrap Application**: Sets up ArgoCD self-management
-8. **Creates App of Apps**: Triggers deployment of all applications
+## Access Scripts
 
-### Requirements
+### fix-endpoints.sh
 
-- `kubectl` configured to access your cluster
-- `helm` v3.x (will be auto-installed if missing on macOS/Linux)
-- Cluster with sufficient resources
-- macOS: Homebrew (for auto-install)
-- Linux: curl and sudo access (for auto-install)
+**Main script to fix and test all endpoints.** Use this when endpoints are not working.
 
-### Output
+```bash
+./scripts/fix-endpoints.sh
+```
 
-The script will:
-- Display progress for each step
-- Show the ArgoCD admin password
-- Provide next steps for accessing ArgoCD UI
+**What it does:**
+- Applies Istio Gateway if missing
+- Applies all VirtualServices
+- Configures ArgoCD for insecure mode
+- Starts port-forward to Istio Gateway
+- Tests all 9 endpoints
 
-### Troubleshooting
+### access-all-services.sh
 
-If the script fails:
-1. Check cluster connectivity: `kubectl cluster-info`
-2. Verify Helm is installed: `helm version`
-3. Check ArgoCD installation: `kubectl get pods -n argocd`
-4. View logs: `kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server`
+**Access all services via Istio Gateway.** Use this when everything is working and you just need to access services.
+
+```bash
+./scripts/access-all-services.sh
+```
+
+**What it does:**
+- Starts port-forward to Istio Gateway
+- Shows all service URLs and access information
+- Displays ArgoCD credentials
+
+### show-endpoints.sh
+
+**Show endpoint information without starting port-forward.** Use this to see how to access services.
+
+```bash
+./scripts/show-endpoints.sh
+```
+
+**What it does:**
+- Shows Istio Gateway IP/address
+- Displays all service URLs
+- Provides /etc/hosts setup commands
+- Shows ArgoCD credentials
+
+## Quick Reference
+
+| Script | Purpose | When to Use |
+|--------|---------|-------------|
+| `migrate-to-gitops.sh` | Full migration | Setting up from scratch |
+| `bootstrap.sh` | Deploy via GitOps | After migration or fresh install |
+| `fix-endpoints.sh` | Fix broken endpoints | Endpoints not working |
+| `access-all-services.sh` | Access services | Everything working, need access |
+| `show-endpoints.sh` | Show endpoint info | Need to see access URLs |
+| `cleanup.sh` | Clean up deployments | Before migration or reset |
 
