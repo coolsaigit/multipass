@@ -13,7 +13,7 @@ spec:
             namespace: istio-system
   template:
     metadata:
-      name: istio-{{environment}}
+      name: istio
       namespace: argocd
       finalizers:
         - resources-finalizer.argocd.argoproj.io
