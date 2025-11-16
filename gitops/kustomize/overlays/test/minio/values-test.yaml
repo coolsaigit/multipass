@@ -1,5 +1,5 @@
-# Development environment overrides for MinIO Helm chart
-namespace: dev
+# Test environment overrides for MinIO Helm chart
+namespace: test
 
 replicas: 1
 

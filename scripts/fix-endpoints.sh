@@ -79,7 +79,7 @@ FAILED=0
 
 for host in "${HOSTS[@]}"; do
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Host: $host" http://localhost:"${LOCAL_PORT}" 2>/dev/null || echo "000")
-    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ] || [ "$HTTP_CODE" = "301" ]; then
+    if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "302" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "303" ]; then
         echo -e "${GREEN}✓ ${host}${NC} (HTTP ${HTTP_CODE})"
         ((SUCCESS++))
     else

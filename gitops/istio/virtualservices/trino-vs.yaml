@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: trino
-  namespace: iceberg
+  namespace: dev
 spec:
   hosts:
     - trino.local
@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: trino.iceberg.svc.cluster.local
+            host: trino.dev.svc.cluster.local
             port:
               number: 8080
 

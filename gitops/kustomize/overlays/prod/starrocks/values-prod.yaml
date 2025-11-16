@@ -1,5 +1,5 @@
 # Production environment overrides for StarRocks Helm chart
-namespace: starrocks
+namespace: prod
 
 frontend:
   replicas: 3

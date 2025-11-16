@@ -1,5 +1,5 @@
 # Production environment overrides for MinIO Helm chart
-namespace: minio
+namespace: prod
 
 replicas: 2
 

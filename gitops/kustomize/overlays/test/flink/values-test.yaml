@@ -1,5 +1,5 @@
-# Development environment overrides for Flink Helm chart
-namespace: dev
+# Test environment overrides for Flink Helm chart
+namespace: test
 
 jobmanager:
   replicas: 1

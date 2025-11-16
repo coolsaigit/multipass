@@ -1,5 +1,5 @@
-# Development environment overrides for Iceberg Helm chart
-namespace: dev
+# Test environment overrides for Iceberg Helm chart
+namespace: test
 
 restCatalog:
   replicas: 1
@@ -24,3 +24,4 @@ trino:
     queryMaxMemory: "1GB"
     queryMaxMemoryPerNode: "500MB"
     jvmHeapSize: "512M"
+

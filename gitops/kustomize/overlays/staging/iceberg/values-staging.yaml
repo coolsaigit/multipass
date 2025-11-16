@@ -1,5 +1,5 @@
 # Staging environment overrides for Iceberg Helm chart
-namespace: iceberg
+namespace: staging
 
 restCatalog:
   replicas: 2

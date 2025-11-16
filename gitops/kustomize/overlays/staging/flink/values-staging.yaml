@@ -1,5 +1,5 @@
 # Staging environment overrides for Flink Helm chart
-namespace: flink
+namespace: staging
 
 jobmanager:
   replicas: 1

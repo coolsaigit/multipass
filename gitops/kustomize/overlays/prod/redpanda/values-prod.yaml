@@ -1,5 +1,5 @@
 # Production environment overrides for Redpanda Helm chart
-namespace: redpanda
+namespace: prod
 
 redpanda:
   replicas: 3

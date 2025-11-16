@@ -1,5 +1,5 @@
-# Development environment overrides for StarRocks Helm chart
-namespace: dev
+# Test environment overrides for StarRocks Helm chart
+namespace: test
 
 frontend:
   replicas: 1

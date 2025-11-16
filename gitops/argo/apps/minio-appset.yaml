@@ -10,13 +10,16 @@ spec:
     - list:
         elements:
           - environment: dev
-            namespace: minio
+            namespace: dev
             valuesFile: ../../kustomize/overlays/dev/minio/values-dev.yaml
+          - environment: test
+            namespace: test
+            valuesFile: ../../kustomize/overlays/test/minio/values-test.yaml
           - environment: staging
-            namespace: minio
+            namespace: staging
             valuesFile: ../../kustomize/overlays/staging/minio/values-staging.yaml
           - environment: prod
-            namespace: minio
+            namespace: prod
             valuesFile: ../../kustomize/overlays/prod/minio/values-prod.yaml
   template:
     metadata:

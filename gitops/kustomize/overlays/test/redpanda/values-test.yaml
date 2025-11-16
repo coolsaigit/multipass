@@ -1,5 +1,5 @@
-# Development environment overrides for Redpanda Helm chart
-namespace: dev
+# Test environment overrides for Redpanda Helm chart
+namespace: test
 
 redpanda:
   replicas: 1

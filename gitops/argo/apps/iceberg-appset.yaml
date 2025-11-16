@@ -10,13 +10,16 @@ spec:
     - list:
         elements:
           - environment: dev
-            namespace: iceberg
+            namespace: dev
             valuesFile: ../../kustomize/overlays/dev/iceberg/values-dev.yaml
+          - environment: test
+            namespace: test
+            valuesFile: ../../kustomize/overlays/test/iceberg/values-test.yaml
           - environment: staging
-            namespace: iceberg
+            namespace: staging
             valuesFile: ../../kustomize/overlays/staging/iceberg/values-staging.yaml
           - environment: prod
-            namespace: iceberg
+            namespace: prod
             valuesFile: ../../kustomize/overlays/prod/iceberg/values-prod.yaml
   template:
     metadata:

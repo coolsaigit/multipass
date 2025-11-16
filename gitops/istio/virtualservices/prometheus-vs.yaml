@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: prometheus-dev-kube-promet-prometheus.monitoring.svc.cluster.local
+            host: prometheus-dev-kube-promet-prometheus.monitoring
             port:
               number: 9090
 

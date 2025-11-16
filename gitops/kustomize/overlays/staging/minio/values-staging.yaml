@@ -1,5 +1,5 @@
 # Staging environment overrides for MinIO Helm chart
-namespace: minio
+namespace: staging
 
 replicas: 1
 

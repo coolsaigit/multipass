@@ -10,13 +10,16 @@ spec:
     - list:
         elements:
           - environment: dev
-            namespace: redpanda
+            namespace: dev
             valuesFile: ../../kustomize/overlays/dev/redpanda/values-dev.yaml
+          - environment: test
+            namespace: test
+            valuesFile: ../../kustomize/overlays/test/redpanda/values-test.yaml
           - environment: staging
-            namespace: redpanda
+            namespace: staging
             valuesFile: ../../kustomize/overlays/staging/redpanda/values-staging.yaml
           - environment: prod
-            namespace: redpanda
+            namespace: prod
             valuesFile: ../../kustomize/overlays/prod/redpanda/values-prod.yaml
   template:
     metadata:

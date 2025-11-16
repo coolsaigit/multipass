@@ -10,13 +10,16 @@ spec:
     - list:
         elements:
           - environment: dev
-            namespace: starrocks
+            namespace: dev
             valuesFile: ../../kustomize/overlays/dev/starrocks/values-dev.yaml
+          - environment: test
+            namespace: test
+            valuesFile: ../../kustomize/overlays/test/starrocks/values-test.yaml
           - environment: staging
-            namespace: starrocks
+            namespace: staging
             valuesFile: ../../kustomize/overlays/staging/starrocks/values-staging.yaml
           - environment: prod
-            namespace: starrocks
+            namespace: prod
             valuesFile: ../../kustomize/overlays/prod/starrocks/values-prod.yaml
   template:
     metadata:

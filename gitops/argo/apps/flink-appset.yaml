@@ -10,13 +10,16 @@ spec:
     - list:
         elements:
           - environment: dev
-            namespace: flink
+            namespace: dev
             valuesFile: ../../kustomize/overlays/dev/flink/values-dev.yaml
+          - environment: test
+            namespace: test
+            valuesFile: ../../kustomize/overlays/test/flink/values-test.yaml
           - environment: staging
-            namespace: flink
+            namespace: staging
             valuesFile: ../../kustomize/overlays/staging/flink/values-staging.yaml
           - environment: prod
-            namespace: flink
+            namespace: prod
             valuesFile: ../../kustomize/overlays/prod/flink/values-prod.yaml
   template:
     metadata:

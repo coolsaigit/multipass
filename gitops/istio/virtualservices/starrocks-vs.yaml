@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: starrocks
-  namespace: starrocks
+  namespace: dev
 spec:
   hosts:
     - starrocks.local
@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: starrocks-fe.starrocks.svc.cluster.local
+            host: starrocks-fe.dev.svc.cluster.local
             port:
               number: 8030
 

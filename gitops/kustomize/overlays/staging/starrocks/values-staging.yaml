@@ -1,5 +1,5 @@
 # Staging environment overrides for StarRocks Helm chart
-namespace: starrocks
+namespace: staging
 
 frontend:
   replicas: 2

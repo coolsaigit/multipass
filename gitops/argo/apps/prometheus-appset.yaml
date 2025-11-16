@@ -38,6 +38,7 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
+          - SkipCRDs=false
         retry:
           limit: 5
           backoff:

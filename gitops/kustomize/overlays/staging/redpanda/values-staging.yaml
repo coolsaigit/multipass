@@ -1,5 +1,5 @@
 # Staging environment overrides for Redpanda Helm chart
-namespace: redpanda
+namespace: staging
 
 redpanda:
   replicas: 2

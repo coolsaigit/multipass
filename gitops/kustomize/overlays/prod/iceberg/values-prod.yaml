@@ -1,5 +1,5 @@
 # Production environment overrides for Iceberg Helm chart
-namespace: iceberg
+namespace: prod
 
 restCatalog:
   replicas: 3

@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: minio
-  namespace: minio
+  namespace: dev
 spec:
   hosts:
     - minio.local
@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: minio
+            host: minio.dev
             port:
               number: 9001
 
