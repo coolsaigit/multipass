@@ -37,19 +37,19 @@ spec:
         image: "{{ .Values.redpanda.image.repository }}:{{ .Values.redpanda.image.tag }}"
         imagePullPolicy: {{ .Values.redpanda.image.pullPolicy }}
         command:
-        - /usr/bin/rpk
+        - /opt/redpanda/bin/redpanda
         args:
-        - redpanda
-        - start
         - --redpanda-cfg
         - /etc/redpanda/redpanda.yaml
         - --smp
         - "1"
         - --memory
         - "512M"
-        - --mode
-        - dev-container
         - --default-log-level=info
+        - --overprovisioned
+        - --unsafe-bypass-fsync=true
+        - --lock-memory=false
+        - --reserve-memory=0M
         env:
         - name: POD_NAME
           valueFrom:
