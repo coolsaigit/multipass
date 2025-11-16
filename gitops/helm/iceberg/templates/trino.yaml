@@ -54,37 +54,6 @@ spec:
       labels:
         app: trino
     spec:
-      initContainers:
-      - name: install-iceberg
-        image: "{{ .Values.trino.image.repository }}:{{ .Values.trino.image.tag }}"
-        imagePullPolicy: {{ .Values.trino.image.pullPolicy }}
-        command: ["/bin/bash", "-c"]
-        args:
-        - |
-          set -e
-          echo "Installing Iceberg connector..."
-          PLUGIN_DIR="/usr/lib/trino/plugin"
-          ICEBERG_PLUGIN_DIR="${PLUGIN_DIR}/iceberg"
-          mkdir -p "${ICEBERG_PLUGIN_DIR}"
-          
-          # Get Trino version
-          TRINO_VERSION=$(trino --version 2>/dev/null | grep -oP 'version \K[0-9.]+' || echo "478")
-          echo "Trino version: ${TRINO_VERSION}"
-          
-          # Check if Iceberg connector already exists in the image
-          # Modern Trino images (478+) include Iceberg connector by default
-          if [ -d "${ICEBERG_PLUGIN_DIR}" ] && [ "$(ls -A ${ICEBERG_PLUGIN_DIR} 2>/dev/null)" ]; then
-            echo "Iceberg connector already exists in image - copying to shared volume..."
-            cp -r "${ICEBERG_PLUGIN_DIR}"/* "${ICEBERG_PLUGIN_DIR}/" 2>/dev/null || true
-            echo "Iceberg connector ready."
-          else
-            echo "Warning: Iceberg connector not found in image."
-            echo "Trino 478+ should include Iceberg connector by default."
-            echo "If errors persist, consider using a Trino image with Iceberg pre-installed."
-          fi
-        volumeMounts:
-        - name: plugins
-          mountPath: /usr/lib/trino/plugin
       containers:
       - name: trino
         image: "{{ .Values.trino.image.repository }}:{{ .Values.trino.image.tag }}"
@@ -97,8 +66,6 @@ spec:
           mountPath: /etc/trino
         - name: catalog
           mountPath: /etc/trino/catalog
-        - name: plugins
-          mountPath: /usr/lib/trino/plugin
         resources:
           {{- toYaml .Values.trino.resources | nindent 10 }}
       volumes:
@@ -111,8 +78,6 @@ spec:
           items:
           - key: iceberg.properties
             path: iceberg.properties
-      - name: plugins
-        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
