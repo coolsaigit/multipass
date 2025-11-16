@@ -18,6 +18,18 @@ spec:
       labels:
         app: redpanda
     spec:
+      initContainers:
+      - name: config-generator
+        image: busybox:latest
+        command: ['sh', '/etc/redpanda/generate-config.sh']
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: config
+          mountPath: /etc/redpanda
       containers:
       - name: redpanda
         image: "{{ .Values.redpanda.image.repository }}:{{ .Values.redpanda.image.tag }}"
@@ -27,24 +39,8 @@ spec:
         args:
         - redpanda
         - start
-        - --kafka-addr
-        - internal://0.0.0.0:9092,external://0.0.0.0:19092
-        - --advertise-kafka-addr
-        - internal://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:9092,external://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:19092
-        {{- if gt (int .Values.redpanda.replicas) 1 }}
-        - --seed-servers
-        - redpanda-0.{{ .Values.namespace }}.svc.cluster.local:33145{{- range $i := until (int .Values.redpanda.replicas) }}{{- if gt $i 0 }},redpanda-{{ $i }}.{{ $.Values.namespace }}.svc.cluster.local:33145{{- end }}{{- end }}
-        {{- end }}
-        - --pandaproxy-addr
-        - internal://0.0.0.0:8082,external://0.0.0.0:18082
-        - --advertise-pandaproxy-addr
-        - internal://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:8082,external://redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:18082
-        - --schema-registry-addr
-        - internal://0.0.0.0:8081,external://0.0.0.0:18081
-        - --rpc-addr
-        - 0.0.0.0:33145
-        - --advertise-rpc-addr
-        - redpanda-$(POD_NAME).{{ .Values.namespace }}.svc.cluster.local:33145
+        - --redpanda-cfg
+        - /etc/redpanda/redpanda.yaml
         - --smp
         - "1"
         - --memory
@@ -75,12 +71,18 @@ spec:
         - containerPort: 33145
           name: rpc
         volumeMounts:
+        - name: config
+          mountPath: /etc/redpanda
         {{- if .Values.redpanda.persistence.enabled }}
         - name: data
           mountPath: /var/lib/redpanda/data
         {{- end }}
         resources:
           {{- toYaml .Values.redpanda.resources | nindent 10 }}
+      volumes:
+      - name: config
+        configMap:
+          name: redpanda-config
   {{- if .Values.redpanda.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
