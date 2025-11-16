@@ -102,47 +102,23 @@ if [ $FAILED -gt 0 ]; then
     echo ""
 fi
 
-# Get Gateway info for access
-EXTERNAL_IP=$(kubectl get svc "${ISTIO_SVC}" -n "${ISTIO_NAMESPACE}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
-NODE_PORT=$(kubectl get svc "${ISTIO_SVC}" -n "${ISTIO_NAMESPACE}" -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}' 2>/dev/null || echo "")
-
-if [ -n "${EXTERNAL_IP}" ]; then
-    GATEWAY_IP="${EXTERNAL_IP}"
-    ACCESS_METHOD="LoadBalancer"
-elif [ -n "${NODE_PORT}" ]; then
-    NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null | awk '{print $1}' || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null | awk '{print $1}' || echo "YOUR_NODE_IP")
-    GATEWAY_IP="${NODE_IP}"
-    ACCESS_METHOD="NodePort (port ${NODE_PORT})"
-    PORT_NOTE=":${NODE_PORT}"
-else
-    GATEWAY_IP="127.0.0.1"
-    ACCESS_METHOD="Port-Forward (localhost:${LOCAL_PORT})"
-    PORT_NOTE=":${LOCAL_PORT}"
-fi
-
 # Get ArgoCD password
 ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" 2>/dev/null | base64 -d || echo "")
 
-# Show access information
+# Show access information (simplified - always show port-forward URLs since we're using port-forward)
 echo -e "${GREEN}=== Access Information ===${NC}\n"
-echo -e "${YELLOW}Gateway:${NC} ${GATEWAY_IP}"
-echo -e "${YELLOW}Access Method:${NC} ${ACCESS_METHOD}\n"
+echo -e "${YELLOW}Access Method:${NC} Port-forward to Istio Gateway (localhost:${LOCAL_PORT})\n"
 
 echo -e "${GREEN}Service URLs:${NC}\n"
 for host in "${HOSTS[@]}"; do
-    echo -e "  ${BLUE}http://${host}${PORT_NOTE:-}${NC}"
+    echo -e "  ${BLUE}http://${host}:${LOCAL_PORT}${NC}"
 done
 
 echo ""
 echo -e "${YELLOW}Quick Setup (/etc/hosts):${NC}"
-if [ "${ACCESS_METHOD}" != "Port-Forward (localhost:${LOCAL_PORT})" ]; then
-    HOSTS_ENTRIES="${GATEWAY_IP} ${HOSTS[*]}"
-    echo -e "  ${BLUE}echo \"${HOSTS_ENTRIES}\" | sudo tee -a /etc/hosts${NC}\n"
-else
-    HOSTS_ENTRIES="127.0.0.1 ${HOSTS[*]}"
-    echo -e "  ${BLUE}echo \"${HOSTS_ENTRIES}\" | sudo tee -a /etc/hosts${NC}\n"
-    echo -e "${YELLOW}Note: Using port-forward. Access via: http://<hostname>.local:${LOCAL_PORT}${NC}\n"
-fi
+HOSTS_ENTRIES="127.0.0.1 ${HOSTS[*]}"
+echo -e "  ${BLUE}echo \"${HOSTS_ENTRIES}\" | sudo tee -a /etc/hosts${NC}\n"
+echo -e "${YELLOW}After adding to /etc/hosts, access via: http://<hostname>.local:${LOCAL_PORT}${NC}\n"
 
 if [ -n "${ARGOCD_PASSWORD}" ]; then
     echo -e "${YELLOW}ArgoCD Credentials:${NC}"
