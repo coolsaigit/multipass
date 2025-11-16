@@ -10,9 +10,9 @@ data:
     node.data-dir=/tmp/trino-data
   config.properties: |
     coordinator=true
-    node-scheduler.include-coordinator=true
+    node-scheduler.include-coordinator=false
     http-server.http.port=8080
-    discovery.uri=http://trino.{{ .Values.namespace }}:8080
+    discovery.uri=http://trino.{{ .Values.namespace }}.svc.cluster.local:8080
     query.max-memory={{ .Values.trino.config.queryMaxMemory }}
     query.max-memory-per-node={{ .Values.trino.config.queryMaxMemoryPerNode }}
   jvm.config: |
