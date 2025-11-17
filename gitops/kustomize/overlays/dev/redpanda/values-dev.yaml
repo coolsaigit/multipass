@@ -29,6 +29,33 @@ config:
   node:
     developer_mode: true
 
+# Configure listeners - disable external to prevent malformed hostnames
+# The Helm chart creates 'internal' and 'default' (external) listeners by default
+# We need to disable the external/default listener for each API
+listeners:
+  kafka:
+    port: 9093
+    external:
+      default:
+        enabled: false
+  admin:
+    port: 9644
+    external:
+      default:
+        enabled: false
+  http:
+    enabled: true
+    port: 8082
+    external:
+      default:
+        enabled: false
+  schemaRegistry:
+    enabled: true
+    port: 8081
+    external:
+      default:
+        enabled: false
+
 # TLS is disabled - the chart enables TLS by default and uses cert-manager
 # We disable it for dev environment
 tls:
@@ -40,7 +67,9 @@ console:
   config:
     kafka:
       brokers:
-        - redpanda.dev.svc.cluster.local:9092
+        - redpanda.dev.svc.cluster.local:9093
+      # Use only the internal listener, ignore external/default listener
+      brokerListener: internal
     schemaRegistry:
       enabled: true
       urls:
