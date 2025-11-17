@@ -1,11 +1,16 @@
-# Development environment overrides for Redpanda Operator CRD
-namespace: dev
+# Development environment overrides for Redpanda Helm chart
+# Using official Helm chart from https://charts.redpanda.com
+# Documentation: https://docs.redpanda.com/current/deploy/redpanda/kubernetes/k-production-deployment/
 
-# StatefulSet configuration for dev
+# Image configuration
+image:
+  tag: v25.2.11
+
+# StatefulSet configuration
 statefulset:
   replicas: 3
 
-# Resource configuration for dev
+# Resource configuration
 resources:
   cpu:
     cores: 1
@@ -13,17 +18,30 @@ resources:
     container:
       max: 1Gi
 
-# Storage configuration for dev
+# Storage configuration
 storage:
   persistentVolume:
     enabled: true
     size: 10Gi
 
-# Configuration for dev
+# Redpanda configuration
 config:
   node:
     developer_mode: true
 
-# Console configuration for dev
+# TLS is disabled - the chart enables TLS by default and uses cert-manager
+# We disable it for dev environment
+tls:
+  enabled: false
+
+# Console configuration
 console:
   enabled: true
+  config:
+    kafka:
+      brokers:
+        - redpanda.dev.svc.cluster.local:9092
+    schemaRegistry:
+      enabled: true
+      urls:
+        - http://redpanda.dev.svc.cluster.local:8081

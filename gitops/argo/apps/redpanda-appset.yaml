@@ -20,7 +20,7 @@ spec:
           #   valuesFile: ../../kustomize/overlays/staging/redpanda/values-staging.yaml
           # - environment: prod
           #   namespace: prod
-          #   valuesFile: ../../kustomize/overlays/prod/redpanda/values-prod.yaml
+          #   valuesFile: ../../kustomize/overlay``s/prod/redpanda/values-prod.yaml
   template:
     metadata:
       name: redpanda-{{environment}}
@@ -32,12 +32,12 @@ spec:
     spec:
       project: multipass
       source:
-        repoURL: https://github.com/coolsaigit/multipass.git
-        targetRevision: main
-        path: gitops/helm/redpanda
+        repoURL: https://charts.redpanda.com
+        targetRevision: 25.1.2
+        chart: redpanda
         helm:
+          releaseName: redpanda
           valueFiles:
-            - values.yaml
             - "{{valuesFile}}"
       destination:
         server: https://kubernetes.default.svc
