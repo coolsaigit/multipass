@@ -32,29 +32,42 @@ config:
 # Configure listeners - disable external to prevent malformed hostnames
 # The Helm chart creates 'internal' and 'default' (external) listeners by default
 # We need to disable the external/default listener for each API
+# Also disable TLS at listener level to prevent certificate mounts
 listeners:
   kafka:
     port: 9093
+    tls:
+      enabled: false
     external:
       default:
         enabled: false
   admin:
     port: 9644
+    tls:
+      enabled: false
     external:
       default:
         enabled: false
   http:
     enabled: true
     port: 8082
+    tls:
+      enabled: false
     external:
       default:
         enabled: false
   schemaRegistry:
     enabled: true
     port: 8081
+    tls:
+      enabled: false
     external:
       default:
         enabled: false
+  rpc:
+    port: 33145
+    tls:
+      enabled: false
 
 # TLS is disabled - the chart enables TLS by default and uses cert-manager
 # We disable it for dev environment
