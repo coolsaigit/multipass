@@ -1,0 +1,8 @@
+#!/bin/bash
+# Convenience wrapper for multipass-cluster.sh
+# Usage: ./scripts/mp-cluster {create|delete|status|kubeconfig}
+# Note: Named 'mp-cluster' to avoid conflict with 'multipass' command
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/multipass-cluster.sh" "$@"
+

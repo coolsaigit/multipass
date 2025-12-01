@@ -1,0 +1,21 @@
+name: Simple Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print working directory
+        run: pwd
+
+      - name: List files
+        run: ls -al
+
+      - name: Simple test
+        run: echo "Self-hosted runner working!"

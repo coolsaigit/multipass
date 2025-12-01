@@ -1,0 +1,88 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    # Talos Linux Kubernetes Cluster
+    # This Vagrantfile creates VMs that boot from Talos ISO images
+    
+    # Define the shared private network subnet for the VMs
+    IP_BASE = "192.168.10."
+    
+    # Talos Control Plane Nodes - each gets a unique IP
+    NODE_SPECS = [
+      { name: "rancher-server-1", node_ip: "192.168.10.10" },
+      { name: "rancher-server-2", node_ip: "192.168.10.11" },
+      { name: "rancher-server-3", node_ip: "192.168.10.12" }
+    ]
+    
+    # Path to Talos ISO - will be downloaded by bootstrap script if not present
+    TALOS_VERSION = ENV['TALOS_VERSION'] || "v1.7.0"
+    TALOS_ISO_DIR = File.expand_path("~/.vagrant/talos-iso")
+    TALOS_ISO_FILE = "#{TALOS_ISO_DIR}/talos-#{TALOS_VERSION}-amd64.iso"
+    TALOS_ISO_URL = "https://github.com/siderolabs/talos/releases/download/#{TALOS_VERSION}/metal-amd64.iso"
+    
+    # Note: Talos ISO will be downloaded by bootstrap-talos.sh if not present
+    # You can also download manually:
+    #   mkdir -p ~/.vagrant/talos-iso
+    #   curl -L -o ~/.vagrant/talos-iso/talos-#{TALOS_VERSION}-amd64.iso #{TALOS_ISO_URL}
+  
+    # Talos Control Plane Nodes
+    NODE_SPECS.each do |node|
+      config.vm.define node[:name] do |vm|
+        vm.vm.hostname = node[:name]
+        
+        # Boot directly from Talos ISO
+        # Note: Vagrant requires a box reference for VM structure, but we boot from ISO first
+        # The box disk is not used - Talos ISO boots before the box disk
+        vm.vm.box = "hashicorp/bionic64"
+        vm.vm.box_check_update = false
+        
+        # Set static private IP for inter-node communication
+        # Talos will be configured with this IP via talosctl
+        vm.vm.network "private_network", ip: node[:node_ip]
+  
+        # Configure hardware resources and boot from ISO
+        vm.vm.provider "virtualbox" do |vb|
+          vb.name = node[:name]
+          vb.memory = 4096           # 4 GB RAM
+          vb.cpus = 2                # 2 CPUs
+          vb.gui = false             # Headless mode
+          
+          # Check ISO exists before proceeding
+          unless File.exist?(TALOS_ISO_FILE)
+            raise "Talos ISO not found: #{TALOS_ISO_FILE}\n" +
+                  "Please run './bootstrap-talos.sh' first to download the ISO, or download manually:\n" +
+                  "  mkdir -p #{TALOS_ISO_DIR}\n" +
+                  "  curl -L -o #{TALOS_ISO_FILE} #{TALOS_ISO_URL}"
+          end
+          
+          # Configure to boot from Talos ISO FIRST (before disk)
+          vb.customize ["modifyvm", :id, "--boot1", "dvd"]
+          vb.customize ["modifyvm", :id, "--boot2", "disk"]
+          vb.customize ["modifyvm", :id, "--boot3", "none"]
+          
+          # Create a disk for Talos to install to (50GB)
+          disk_path = "#{File.expand_path("~/.vagrant/talos-iso")}/#{node[:name]}.vdi"
+          vb.customize ["createhd", "--filename", disk_path, "--size", "51200"]
+          vb.customize ["storageattach", :id,
+            "--storagectl", "SATA Controller",
+            "--port", "0",
+            "--device", "0",
+            "--type", "hdd",
+            "--medium", disk_path]
+          
+          # Attach Talos ISO as DVD drive
+          vb.customize ["storageattach", :id,
+            "--storagectl", "IDE Controller",
+            "--port", "1",
+            "--device", "0",
+            "--type", "dvddrive",
+            "--medium", TALOS_ISO_FILE]
+        end
+        
+        # Note: Talos is immutable and doesn't support shell provisioning
+        # Configuration will be applied via talosctl in the bootstrap script
+        # No provisioning needed - Talos boots directly from ISO
+      end
+    end
+  end

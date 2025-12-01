@@ -9,5 +9,19 @@
         "**/*pycache*": true,
         "**/.pytest_cache": true
     },
-    "hide-files.files": []
+    "hide-files.files": [],
+    "files.associations": {
+        "*.tf": "terraform",
+        "*.tfvars": "terraform",
+        "*.hcl": "terraform"
+      },
+      "terraform.enableLanguageServer": true,
+      "terraform.format.enable": true,
+      "terraform.languageServer": {
+        "external": true
+      },
+      "[terraform]": {
+        "editor.defaultFormatter": "hashicorp.terraform",
+        "editor.formatOnSave": true
+      }
 }

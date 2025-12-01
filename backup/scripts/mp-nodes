@@ -1,0 +1,8 @@
+#!/bin/bash
+# Convenience wrapper for multipass-nodes.sh
+# Usage: ./scripts/mp-nodes {create|delete|status|list}
+# Note: Named 'mp-nodes' to avoid conflict with 'multipass' command
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/multipass-nodes.sh" "$@"
+

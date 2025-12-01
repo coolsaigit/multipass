@@ -1,0 +1,8 @@
+#!/bin/bash
+# Convenience wrapper for multipass-rke2-mgmt.sh
+# Usage: ./scripts/mp-rke2-mgmt {create|delete|status|kubeconfig}
+# Note: Named 'mp-rke2-mgmt' to avoid conflict with 'multipass' command
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+"$SCRIPT_DIR/multipass-rke2-mgmt.sh" "$@"
+
